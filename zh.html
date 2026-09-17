@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkOrg · 域名服务</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
+    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.12);
+    --warn:#f59e0b; --warn-soft:rgba(245,158,11,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:rgba(15,17,23,.9);
+    backdrop-filter:blur(8px); z-index:10;
+  }
+  header .brand{font-size:15px; letter-spacing:1px; font-weight:600;}
+  header .brand span{color:var(--primary);}
+  .lang-switch{display:flex; gap:8px; font-size:13px;}
+  .lang-switch a{
+    color:var(--muted); text-decoration:none; padding:4px 10px;
+    border-radius:6px; border:1px solid var(--line);
+  }
+  .lang-switch a.active{color:#fff; background:var(--primary); border-color:var(--primary);}
+  .lang-switch a:not(.active):hover{color:var(--text); border-color:var(--primary);}
+
+  main{max-width:760px; margin:0 auto; padding:32px 20px 60px;}
+  .page-title{font-size:20px; margin:0 0 4px;}
+  .page-sub{font-size:13px; color:var(--muted); margin:0 0 28px;}
+
+  .domain-card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:16px; padding:24px; margin-bottom:20px;
+  }
+  .domain-card.primary{
+    border-color:var(--primary);
+    box-shadow:0 0 0 1px var(--primary-soft) inset;
+  }
+  .tag{
+    display:inline-block; font-size:11px; letter-spacing:1px;
+    padding:3px 9px; border-radius:999px; margin-bottom:14px;
+  }
+  .tag.main{color:var(--primary); background:var(--primary-soft);}
+  .tag.other{color:var(--warn); background:var(--warn-soft);}
+  .domain-name{
+    font-size:26px; font-weight:600; word-break:break-all;
+    margin:0 0 10px; letter-spacing:.3px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .domain-card.primary .domain-name{font-size:30px; color:var(--primary);}
+  .domain-desc{font-size:14px; color:var(--muted); line-height:1.7; margin:0 0 18px;}
+  .visit{
+    display:inline-flex; align-items:center; gap:6px; font-size:14px;
+    color:#fff; background:var(--primary); text-decoration:none;
+    padding:9px 16px; border-radius:9px; transition:opacity .15s;
+  }
+  .visit:hover{opacity:.88;}
+  .visit.ghost{background:transparent; color:var(--warn); border:1px solid var(--warn);}
+  .visit.ghost:hover{background:var(--warn-soft); opacity:1;}
+  .loading{color:var(--muted); font-size:14px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Spark<span>Org</span></div>
+  <nav class="lang-switch">
+    <a href="zh.html" class="active">中文</a>
+    <a href="en.html">English</a>
+  </nav>
+</header>
+
+<main>
+  <h1 class="page-title">域名服务</h1>
+  <p class="page-sub">以下是本服务可用的域名列表</p>
+  <div id="cards"><p class="loading">加载中…</p></div>
+</main>
+
+<script>
+/* ===== 域名配置读取（三个页面共用同一段逻辑） ===== */
+var DEFAULT_DOMAINS = { primary: ['sparkorg.dpdns.org'], others: ['sparkorg.cc.cd'] };
+
+function parseDomains(text){
+  var primary = [], others = [];
+  text.split(/\r?\n/).forEach(function(line){
+    line = line.trim();
+    if(!line || line.charAt(0) === '#') return;
+    var i = line.indexOf('=');
+    if(i < 0) return;
+    var key = line.slice(0, i).trim().toLowerCase();
+    var val = line.slice(i + 1).trim();
+    if(!val) return;
+    if(key === 'primary') primary.push(val);
+    else if(key === 'other') others.push(val);
+  });
+  if(!primary.length && !others.length) return DEFAULT_DOMAINS;
+  return { primary: primary, others: others };
+}
+
+function loadDomains(cb){
+  if(!window.fetch){ cb(DEFAULT_DOMAINS); return; }
+  fetch('domain.txt')
+    .then(function(r){ if(!r.ok) throw 0; return r.text(); })
+    .then(function(t){ cb(parseDomains(t)); })
+    .catch(function(){ cb(DEFAULT_DOMAINS); });
+}
+/* ===== 域名配置读取结束 ===== */
+
+function buildCard(name, isPrimary){
+  var tag  = isPrimary ? '主域名 · 推荐使用' : '其他域名 · 备用';
+  var kind = isPrimary ? 'main' : 'other';
+  var desc = isPrimary
+    ? '主域名,可能变动'
+    : '备用域名,不稳定';
+  var btn  = isPrimary ? '访问主域名 →' : '尝试访问 →';
+  var cls  = isPrimary ? 'visit' : 'visit ghost';
+  return '<section class="domain-card' + (isPrimary ? ' primary' : '') + '">'
+       +   '<span class="tag ' + kind + '">' + tag + '</span>'
+       +   '<h2 class="domain-name">' + name + '</h2>'
+       +   '<p class="domain-desc">' + desc + '</p>'
+       +   '<a class="' + cls + '" href="https://' + name + '" target="_blank" rel="noopener">' + btn + '</a>'
+       + '</section>';
+}
+
+loadDomains(function(d){
+  var html = '';
+  d.primary.forEach(function(v){ html += buildCard(v, true);  });
+  d.others .forEach(function(v){ html += buildCard(v, false); });
+  document.getElementById('cards').innerHTML = html || '<p class="loading">未配置域名</p>';
+});
+
+/* 记录语言偏好 */
+localStorage.setItem('lang', 'zh');
+</script>
+
+</body>
+</html>

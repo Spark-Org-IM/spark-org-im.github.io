@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkOrg · 选择语言 / Select Language</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
+    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.15);
+    --warn:#f59e0b; --warn-soft:rgba(245,158,11,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .wrap{width:100%; max-width:460px; text-align:center;}
+  .logo{font-size:13px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:10px;}
+  h1{font-size:24px; margin:0 0 6px;}
+  .sub{font-size:14px; color:var(--muted); margin:0 0 24px;}
+  .langs{display:flex; flex-direction:column; gap:12px; margin-bottom:28px;}
+  .lang-btn{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; color:var(--text); text-decoration:none; font-size:16px;
+    transition:border-color .15s, background .15s;
+  }
+  .lang-btn:hover{border-color:var(--primary); background:var(--primary-soft);}
+  .lang-btn .code{font-size:12px; color:var(--muted); letter-spacing:1px;}
+  .preview{
+    text-align:left; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:16px 18px; font-size:13px;
+  }
+  .preview-title{
+    color:var(--muted); font-size:12px; letter-spacing:1px;
+    text-transform:uppercase; margin-bottom:10px;
+  }
+  .preview .dom{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    padding:6px 0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    word-break:break-all;
+  }
+  .preview .dom + .dom{border-top:1px dashed var(--line);}
+  .preview .dom .role{
+    flex-shrink:0; font-size:11px; padding:2px 8px; border-radius:999px;
+  }
+  .role.main{color:var(--primary); background:var(--primary-soft);}
+  .role.other{color:var(--warn); background:var(--warn-soft);}
+  .tip{margin-top:20px; font-size:12px; color:var(--muted); line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo">SparkOrg</div>
+  <h1>选择语言 / Select Language</h1>
+  <p class="sub">请选择你要查看的语言 · Choose your language</p>
+
+  <div class="langs">
+    <a class="lang-btn" href="zh.html"><span>中文</span><span class="code">ZH</span></a>
+    <a class="lang-btn" href="en.html"><span>English</span><span class="code">EN</span></a>
+  </div>
+
+  <div class="preview">
+    <div class="preview-title">当前域名 · Domains</div>
+    <div id="domains">加载中… / Loading…</div>
+  </div>
+
+  <p class="tip">
+    如果页面没有自动跳转，请手动点击上面的语言。<br>
+    If the page didn't redirect automatically, please pick a language above.
+  </p>
+</div>
+
+<script>
+/* ===== 域名配置读取（三个页面共用同一段逻辑） ===== */
+var DEFAULT_DOMAINS = { primary: ['sparkorg.dpdns.org'], others: ['sparkorg.cc.cd'] };
+
+function parseDomains(text){
+  var primary = [], others = [];
+  text.split(/\r?\n/).forEach(function(line){
+    line = line.trim();
+    if(!line || line.charAt(0) === '#') return;
+    var i = line.indexOf('=');
+    if(i < 0) return;
+    var key = line.slice(0, i).trim().toLowerCase();
+    var val = line.slice(i + 1).trim();
+    if(!val) return;
+    if(key === 'primary') primary.push(val);
+    else if(key === 'other') others.push(val);
+  });
+  if(!primary.length && !others.length) return DEFAULT_DOMAINS;
+  return { primary: primary, others: others };
+}
+
+function loadDomains(cb){
+  if(!window.fetch){ cb(DEFAULT_DOMAINS); return; }
+  fetch('domain.txt')
+    .then(function(r){ if(!r.ok) throw 0; return r.text(); })
+    .then(function(t){ cb(parseDomains(t)); })
+    .catch(function(){ cb(DEFAULT_DOMAINS); });
+}
+/* ===== 域名配置读取结束 ===== */
+
+loadDomains(function(d){
+  var html = '';
+  d.primary.forEach(function(v){
+    html += '<div class="dom"><span>' + v + '</span><span class="role main">主 / Main</span></div>';
+  });
+  d.others.forEach(function(v){
+    html += '<div class="dom"><span>' + v + '</span><span class="role other">备用 / Backup</span></div>';
+  });
+  document.getElementById('domains').innerHTML = html || '（未配置域名）';
+});
+
+/* 语言识别 + 跳转 */
+(function () {
+  var saved = localStorage.getItem('lang');
+  if (saved === 'zh' || saved === 'en') {
+    location.replace(saved + '.html');
+    return;
+  }
+  var lang = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
+  location.replace(lang.indexOf('zh') === 0 ? 'zh.html' : 'en.html');
+})();
+</script>
+
+</body>
+</html>
