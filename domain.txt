@@ -9,4 +9,4 @@
 
 primary=sparkorg.dpdns.org
 
-other=sparkorg.cc.cd
+# other=sparkorg.cc.cd
