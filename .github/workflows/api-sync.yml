@@ -1,0 +1,43 @@
+name: Sync API files
+
+# 后台数据只改一个文件 (domain.txt)，本 Action 自动重新生成全部接口文件并提交。
+# The backend data is a single file (domain.txt); this Action regenerates
+# every API endpoint file from it and commits the result.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'domain.txt'
+      - 'scripts/generate-api.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate API files from domain.txt
+        run: node scripts/generate-api.mjs
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add api go.html
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: sync generated API files from domain.txt"
+            git push
+          fi

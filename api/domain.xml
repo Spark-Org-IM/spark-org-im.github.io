@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SparkOrg · Domain API（由 scripts/generate-api.mjs 从 domain.txt 生成，请勿手工编辑） -->
+<domains>
+  <primary_domain>sparkorg.dpdns.org</primary_domain>
+  <primary>
+    <domain>sparkorg.dpdns.org</domain>
+  </primary>
+  <others>
+  </others>
+</domains>
