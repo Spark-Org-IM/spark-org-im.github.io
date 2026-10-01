@@ -7,419 +7,62 @@
 <style>
   :root{
     --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
-    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.12);
-    --warn:#f59e0b; --warn-soft:rgba(245,158,11,.12);
-    --ok:#22c55e; --ok-soft:rgba(34,197,94,.12);
+    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.15);
   }
   *{box-sizing:border-box;}
   body{
     margin:0; min-height:100vh; background:var(--bg); color:var(--text);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:24px;
   }
-  header{
+  .wrap{width:100%; max-width:460px; text-align:center;}
+  .logo{font-size:13px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:10px;}
+  h1{font-size:24px; margin:0 0 6px;}
+  .sub{font-size:14px; color:var(--muted); margin:0 0 24px;}
+  .langs{display:flex; flex-direction:column; gap:12px; margin-bottom:28px;}
+  .lang-btn{
     display:flex; align-items:center; justify-content:space-between;
-    padding:14px 20px; border-bottom:1px solid var(--line);
-    position:sticky; top:0; background:rgba(15,17,23,.9);
-    backdrop-filter:blur(8px); z-index:10;
-  }
-  header .brand{font-size:15px; letter-spacing:1px; font-weight:600;}
-  header .brand span{color:var(--primary);}
-  .lang-switch{display:flex; gap:8px; font-size:13px; flex-wrap:wrap;}
-  .lang-switch a{
-    color:var(--muted); text-decoration:none; padding:4px 10px;
-    border-radius:6px; border:1px solid var(--line);
-  }
-  .lang-switch a.active{color:#fff; background:var(--primary); border-color:var(--primary);}
-  .lang-switch a:not(.active):hover{color:var(--text); border-color:var(--primary);}
-
-  main{max-width:860px; margin:0 auto; padding:32px 20px 60px;}
-  .page-title{font-size:22px; margin:0 0 4px;}
-  .page-sub{font-size:13px; color:var(--muted); margin:0 0 28px;}
-
-  .card{
-    background:var(--card); border:1px solid var(--line);
-    border-radius:16px; padding:22px 24px; margin-bottom:20px;
-  }
-  .card h2{font-size:16px; margin:0 0 12px;}
-  .card h2 .en{color:var(--muted); font-weight:400; font-size:13px; margin-left:6px;}
-  .card p{font-size:14px; color:var(--muted); line-height:1.8; margin:8px 0;}
-  .card p strong{color:var(--text);}
-  .hl{color:var(--primary);}
-  code, .mono{
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  }
-  .card code{
-    background:rgba(59,130,246,.12); color:var(--primary);
-    padding:1px 6px; border-radius:5px; font-size:13px;
-  }
-  pre{
-    background:#12141b; border:1px solid var(--line); border-radius:10px;
-    padding:14px 16px; overflow-x:auto; margin:10px 0;
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    font-size:13px; line-height:1.7; color:var(--text);
-  }
-  pre code{background:none; color:inherit; padding:0;}
-
-  table{width:100%; border-collapse:collapse; font-size:13.5px; margin-top:6px;}
-  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
-  th{color:var(--muted); font-weight:500; font-size:12px; letter-spacing:.5px; text-transform:uppercase;}
-  td.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--primary); white-space:nowrap;}
-  td.fmt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--muted); white-space:nowrap; font-size:12.5px;}
-  tr:last-child td{border-bottom:none;}
-
-  .demo-btns{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 14px;}
-  .demo-btns button{
-    font:inherit; font-size:13px; color:var(--text); background:#1d212b;
-    border:1px solid var(--line); border-radius:8px; padding:7px 12px; cursor:pointer;
+    padding:16px 20px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; color:var(--text); text-decoration:none; font-size:16px;
     transition:border-color .15s, background .15s;
   }
-  .demo-btns button:hover{border-color:var(--primary); background:var(--primary-soft);}
-  .demo-btns button.active{border-color:var(--primary); color:var(--primary); background:var(--primary-soft);}
-  .demo-meta{font-size:12px; color:var(--muted); margin:0 0 8px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
-  .demo-meta .ok{color:var(--ok);}
-  .demo-meta .err{color:var(--warn);}
-  .copy{
-    float:right; font:inherit; font-size:12px; color:var(--muted); background:none;
-    border:1px solid var(--line); border-radius:6px; padding:3px 9px; cursor:pointer;
-  }
-  .copy:hover{color:var(--text); border-color:var(--primary);}
-  .note{
-    border-left:3px solid var(--warn); background:var(--warn-soft);
-    border-radius:0 8px 8px 0; padding:10px 14px; font-size:13px;
-    color:var(--text); line-height:1.7; margin-top:14px;
-  }
-  .note b{color:var(--warn);}
-  .flow{
-    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
-    font-size:13.5px; margin:10px 0;
-  }
-  .flow .step{
-    background:#1d212b; border:1px solid var(--line); border-radius:8px;
-    padding:8px 12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  }
-  .flow .arrow{color:var(--muted);}
-  footer{
-    text-align:center; font-size:12px; color:var(--muted);
-    padding:10px 0 40px;
-  }
+  .lang-btn:hover{border-color:var(--primary); background:var(--primary-soft);}
+  .lang-btn .code{font-size:12px; color:var(--muted); letter-spacing:1px;}
+  .tip{font-size:12px; color:var(--muted); line-height:1.7;}
+  .tip a{color:var(--primary);}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="brand">Spark<span>Org</span></div>
-  <nav class="lang-switch">
-    <a href="zh.html">中文</a>
-    <a href="en.html">English</a>
-    <a href="docs.html" class="active">API Docs</a>
-  </nav>
-</header>
+<div class="wrap">
+  <div class="logo">SparkOrg</div>
+  <h1>接口文档 / API Documentation</h1>
+  <p class="sub">请选择文档语言 · Choose your docs language</p>
 
-<main>
-  <h1 class="page-title">接口文档</h1>
-  <p class="page-sub">API Documentation · 单一配置文件，多种接口格式 / One config file, many API formats</p>
+  <div class="langs">
+    <a class="lang-btn" href="docs.zh.html"><span>中文文档</span><span class="code">ZH</span></a>
+    <a class="lang-btn" href="docs.en.html"><span>English Docs</span><span class="code">EN</span></a>
+  </div>
 
-  <!-- ===== 简介 ===== -->
-  <section class="card">
-    <h2>简介 <span class="en">Introduction</span></h2>
-    <p>
-      本服务托管于 <strong>GitHub Pages（纯静态）</strong>。后台数据<strong>只有一个文件</strong>——
-      <a href="domain.txt" class="hl"><code>domain.txt</code></a>，编辑它即可更新全部数据；
-      所有“接口”都是由它生成的<strong>静态文件</strong>，可直接用浏览器、<code>curl</code>、<code>fetch</code>、<code>requests</code> 调用。
-    </p>
-    <p>
-      This service is hosted on GitHub Pages (fully static). The backend data is <strong>a single file</strong> —
-      <a href="domain.txt" class="hl"><code>domain.txt</code></a>. Edit it and every endpoint updates.
-      All “endpoints” are <strong>static files</strong> generated from that one file — callable via browser, <code>curl</code>, <code>fetch</code>, <code>requests</code>.
-    </p>
-    <div class="flow">
-      <span class="step">domain.txt</span>
-      <span class="arrow">→</span>
-      <span class="step">scripts/generate-api.mjs</span>
-      <span class="arrow">→</span>
-      <span class="step">api/*.txt json yaml …</span>
-      <span class="arrow">+</span>
-      <span class="step">go.html</span>
-    </div>
-    <p>
-      数据流向：改一个文件 → 生成器产出所有接口文件 → GitHub Action 自动提交（或本地手动运行脚本）。
-      跳转接口 <code>go.html</code> 额外支持运行时实时读取 <code>domain.txt</code>，因此即使生成文件未刷新，跳转也始终用最新配置。
-    </p>
-  </section>
-
-  <!-- ===== 接口列表 ===== -->
-  <section class="card">
-    <h2>接口列表 <span class="en">Endpoints</span></h2>
-    <p>Base URL：<code id="base-url">https://spark-org-im.github.io</code></p>
-    <table>
-      <thead>
-        <tr><th>路径 Path</th><th>类型 Format</th><th>说明 Description</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="path">/api/domain.txt</td>
-          <td class="fmt">text/plain</td>
-          <td><strong>主域名，纯文本，无任何格式</strong> · Raw primary domain, no formatting</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.json</td>
-          <td class="fmt">application/json</td>
-          <td>JSON 格式 · JSON format</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.yaml<br>/api/domain.yml</td>
-          <td class="fmt">text/yaml</td>
-          <td>YAML 格式（两个路径等价）· YAML format (aliases)</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.toml</td>
-          <td class="fmt">application/toml</td>
-          <td>TOML 格式 · TOML format</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.ini</td>
-          <td class="fmt">text/plain</td>
-          <td>INI 格式（多值逗号分隔）· INI format (comma-separated lists)</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.xml</td>
-          <td class="fmt">application/xml</td>
-          <td>XML 格式 · XML format</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.csv</td>
-          <td class="fmt">text/csv</td>
-          <td>CSV 格式，列：<code>role,domain</code> · CSV with <code>role,domain</code> columns</td>
-        </tr>
-        <tr>
-          <td class="path">/api/domain.env</td>
-          <td class="fmt">text/plain</td>
-          <td>dotenv 环境变量格式 · dotenv env format</td>
-        </tr>
-        <tr>
-          <td class="path">/domain.txt</td>
-          <td class="fmt">text/plain</td>
-          <td>完整配置文件（primary + other 全部）· Full config file (all domains)</td>
-        </tr>
-        <tr>
-          <td class="path">/go.html</td>
-          <td class="fmt">redirect</td>
-          <td><strong>直接跳转主域名</strong> · Redirect directly to the primary domain</td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="note">
-      <b>说明 Note：</b>本站为静态托管，Content-Type 由 GitHub Pages 按扩展名给出；
-      个别扩展名（如 <code>.toml</code>/<code>.ini</code>/<code>.env</code>）可能被标为通用类型，<strong>响应体格式不受影响</strong>。
-      同理，静态站无法返回真正的 HTTP 302，<code>go.html</code> 用 meta refresh + JS 实现等效跳转。
-    </div>
-  </section>
-
-  <!-- ===== 在线演示 ===== -->
-  <section class="card">
-    <h2>在线演示 <span class="en">Live Demo</span></h2>
-    <p>点击按钮直接请求本站接口，实时查看响应（同源请求，无需 CORS 配置）。</p>
-    <div class="demo-btns" id="demo-btns"></div>
-    <div class="demo-meta" id="demo-meta">—</div>
-    <pre id="demo-out"><code>点击上方按钮加载接口响应… / Click a button to load a response…</code></pre>
-  </section>
-
-  <!-- ===== 使用示例 ===== -->
-  <section class="card">
-    <h2>使用示例 <span class="en">Examples</span></h2>
-
-    <p><strong>Shell / curl</strong></p>
-    <pre><code># 主域名，纯文本（无格式）
-curl -s https://spark-org-im.github.io/api/domain.txt
-# => sparkorg.dpdns.org
-
-# JSON
-curl -s https://spark-org-im.github.io/api/domain.json
-
-# YAML / TOML / XML / CSV / ENV
-curl -s https://spark-org-im.github.io/api/domain.yaml
-curl -s https://spark-org-im.github.io/api/domain.toml
-curl -s https://spark-org-im.github.io/api/domain.xml
-curl -s https://spark-org-im.github.io/api/domain.csv
-curl -s https://spark-org-im.github.io/api/domain.env
-
-# 完整配置文件
-curl -s https://spark-org-im.github.io/domain.txt</code></pre>
-
-    <p><strong>JavaScript / fetch</strong></p>
-    <pre><code>// 纯文本主域名
-const domain = await (await fetch('https://spark-org-im.github.io/api/domain.txt')).text();
-console.log(domain.trim()); // sparkorg.dpdns.org
-
-// JSON
-const data = await (await fetch('https://spark-org-im.github.io/api/domain.json')).json();
-console.log(data.primary_domain); // sparkorg.dpdns.org
-console.log(data.primary);        // ["sparkorg.dpdns.org"]</code></pre>
-
-    <p><strong>Python / requests</strong></p>
-    <pre><code>import requests
-
-# 纯文本
-domain = requests.get("https://spark-org-im.github.io/api/domain.txt").text.strip()
-print(domain)  # sparkorg.dpdns.org
-
-# JSON
-data = requests.get("https://spark-org-im.github.io/api/domain.json").json()
-print(data["primary_domain"], data["primary"])</code></pre>
-  </section>
-
-  <!-- ===== 跳转接口 ===== -->
-  <section class="card">
-    <h2>跳转接口 <span class="en">Redirect</span></h2>
-    <p>
-      浏览器打开 <code>https://spark-org-im.github.io/go.html</code> 即可<strong>直接跳转到主域名</strong>。
-      页面优先实时读取 <code>domain.txt</code> 动态决定跳转目标；若读取失败或 JS 不可用，回退到生成时烘焙的主域名（meta refresh 兜底）。
-    </p>
-    <p>
-      Open <code>https://spark-org-im.github.io/go.html</code> in a browser to <strong>redirect straight to the primary domain</strong>.
-      The page reads <code>domain.txt</code> at runtime; if that fails (or JS is off), it falls back to the baked-in primary domain.
-    </p>
-    <table>
-      <thead>
-        <tr><th>地址 URL</th><th>目标 Target</th></tr>
-      </thead>
-      <tbody>
-        <tr><td class="path">/go.html</td><td>主域名 primary（默认 default）</td></tr>
-        <tr><td class="path">/go.html?to=other</td><td>第一个备用域名 first backup（无备用则回退主域名）</td></tr>
-        <tr><td class="path">/go.html?to=2</td><td>第 N 个域名（primary 优先，其次 other）· N-th domain in order</td></tr>
-      </tbody>
-    </table>
-    <div class="note">
-      <b>提示 Tip：</b><code>?to=</code> 参数与实时读取均依赖 JavaScript；禁用 JS 时只会跳转到生成时的主域名。
-      The <code>?to=</code> parameter and live resolution require JavaScript; without JS the page goes to the baked-in primary domain.
-    </div>
-  </section>
-
-  <!-- ===== 配置与同步 ===== -->
-  <section class="card">
-    <h2>配置与同步 <span class="en">Config &amp; Sync</span></h2>
-    <p>
-      <strong>只改一个文件：</strong>编辑 <a href="domain.txt" class="hl"><code>domain.txt</code></a>，
-      <code>primary=</code> 为多行主域名，<code>other=</code> 为多行备用域名，<code>#</code> 开头为注释。
-    </p>
-    <p>
-      <strong>One file to change:</strong> edit <a href="domain.txt" class="hl"><code>domain.txt</code></a> —
-      <code>primary=</code> lines are main domains, <code>other=</code> lines are backups, <code>#</code> starts a comment.
-    </p>
-    <p><strong>更新方式 / How updates propagate：</strong></p>
-    <table>
-      <thead>
-        <tr><th>方式 Way</th><th>说明 Description</th></tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>GitHub Action（自动）</td>
-          <td>推送 <code>domain.txt</code> 变更后，<code>.github/workflows/api-sync.yml</code> 自动运行生成器并提交所有接口文件。<br>Push a change to <code>domain.txt</code>; the Action regenerates and commits every API file.</td>
-        </tr>
-        <tr>
-          <td>本地手动（手动）</td>
-          <td><code>node scripts/generate-api.mjs</code> 然后提交。<br>Run <code>node scripts/generate-api.mjs</code>, then commit.</td>
-        </tr>
-        <tr>
-          <td>跳转接口</td>
-          <td><code>go.html</code> 运行时读取 <code>domain.txt</code>，<strong>无需生成也始终最新</strong>。<br><code>go.html</code> reads <code>domain.txt</code> at runtime — always current, even without regenerating.</td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
-
-  <footer>
-    由 <a href="domain.txt" class="hl">domain.txt</a> 单一配置驱动 · Powered by a single config file
-  </footer>
-</main>
+  <p class="tip">
+    将根据语言偏好自动跳转到对应语言的接口文档。<br>
+    You'll be redirected to the docs in your preferred language.<br>
+    <a href="zh.html">域名页 / Domains</a> · <a href="go.html">跳转主域名 / Go to primary</a>
+  </p>
+</div>
 
 <script>
-/* ===== 在线演示：直接请求本站静态接口 ===== */
-var ENDPOINTS = [
-  { path: '/api/domain.txt', label: 'TXT 纯文本' },
-  { path: '/api/domain.json', label: 'JSON' },
-  { path: '/api/domain.yaml', label: 'YAML' },
-  { path: '/api/domain.toml', label: 'TOML' },
-  { path: '/api/domain.ini', label: 'INI' },
-  { path: '/api/domain.xml', label: 'XML' },
-  { path: '/api/domain.csv', label: 'CSV' },
-  { path: '/api/domain.env', label: 'ENV' },
-  { path: '/domain.txt', label: '完整配置' }
-];
-
-var BASE = location.protocol + '//' + location.host;
-document.getElementById('base-url').textContent = BASE;
-
-var btnBox = document.getElementById('demo-btns');
-var metaEl = document.getElementById('demo-meta');
-var outEl  = document.getElementById('demo-out');
-var activeBtn = null;
-
-ENDPOINTS.forEach(function(ep){
-  var b = document.createElement('button');
-  b.textContent = ep.label;
-  b.addEventListener('click', function(){
-    if(activeBtn) activeBtn.classList.remove('active');
-    activeBtn = b;
-    b.classList.add('active');
-    runDemo(ep);
-  });
-  btnBox.appendChild(b);
-});
-
-function runDemo(ep){
-  metaEl.textContent = 'GET ' + ep.path + ' …';
-  outEl.innerHTML = '<code>加载中… / Loading…</code>';
-  fetch(BASE + ep.path, { cache: 'no-store' })
-    .then(function(r){
-      return r.text().then(function(body){
-        var ct = r.headers.get('content-type') || '(unknown)';
-        var cls = r.ok ? 'ok' : 'err';
-        metaEl.innerHTML = 'GET ' + ep.path + ' → <span class="' + cls + '">' + r.status + '</span> · Content-Type: ' + ct + ' · ' + body.length + ' bytes';
-        outEl.innerHTML = '';
-        var bar = document.createElement('div');
-        var copyBtn = document.createElement('button');
-        copyBtn.className = 'copy';
-        copyBtn.textContent = '复制 Copy';
-        copyBtn.addEventListener('click', function(){ copyText(body, copyBtn); });
-        bar.appendChild(copyBtn);
-        var pre = document.createElement('pre');
-        var code = document.createElement('code');
-        code.textContent = body;
-        pre.appendChild(code);
-        outEl.appendChild(pre);
-        outEl.appendChild(bar);
-      });
-    })
-    .catch(function(e){
-      metaEl.innerHTML = 'GET ' + ep.path + ' → <span class="err">failed</span>';
-      outEl.innerHTML = '<code>' + String(e) + '</code>';
-    });
-}
-
-function copyText(text, btn){
-  var done = function(){
-    var old = btn.textContent;
-    btn.textContent = '已复制 Copied';
-    setTimeout(function(){ btn.textContent = old; }, 1500);
-  };
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
-  } else {
-    fallbackCopy(text, done);
+/* 根目录接口文档入口：按语言偏好跳转到对应语言文档
+   (same pattern as index.html: saved preference first, then browser language) */
+(function () {
+  var saved = localStorage.getItem('lang');
+  if (saved === 'zh' || saved === 'en') {
+    location.replace('docs.' + saved + '.html');
+    return;
   }
-}
-
-function fallbackCopy(text, done){
-  var ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.select();
-  try{ document.execCommand('copy'); done(); }catch(e){}
-  document.body.removeChild(ta);
-}
+  var lang = (navigator.language || navigator.userLanguage || 'zh').toLowerCase();
+  location.replace(lang.indexOf('zh') === 0 ? 'docs.zh.html' : 'docs.en.html');
+})();
 </script>
 
 </body>

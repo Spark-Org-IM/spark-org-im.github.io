@@ -25,7 +25,18 @@ Base URL: `https://spark-org-im.github.io`
 | `/domain.txt` | `text/plain` | 完整配置文件（primary + other 全部）/ Full config file (all domains) |
 | `/go.html` | redirect | **直接跳转主域名** / **Redirect directly to the primary domain** |
 
-完整文档（含在线演示与代码示例）/ Full docs (live demo + code examples): [docs.html](docs.html)
+完整文档（含在线演示与代码示例）/ Full docs (live demo + code examples)：
+
+- [`docs.html`](docs.html) — 文档入口，按语言偏好自动跳转 / docs entry, auto-routes by language
+- [`docs.zh.html`](docs.zh.html) — 中文接口文档 / Chinese API docs
+- [`docs.en.html`](docs.en.html) — 英文接口文档 / English API docs
+
+## 多语言 / Multilingual
+
+- **接口数据**字段名为英文（`primary` / `others` / `primary_domain`）；结构化格式（JSON/YAML/TOML/INI/XML/ENV）的响应附带**中英双语 `labels` 字段**，前端可直接取本地化文案。CSV 为纯数据，不含 labels。
+  Data field names are English; structured formats (JSON/YAML/TOML/INI/XML/ENV) include a **bilingual `labels` field** so front-ends can display localized copy. CSV is pure data without labels.
+- **接口文档**分语言：`docs.html` 依据浏览器语言或站点语言偏好（localStorage `lang`）自动跳转到 `docs.zh.html` 或 `docs.en.html`；展示页 `zh.html` / `en.html` 的 API 入口直接指向对应语言的文档。
+  Docs are per-language: `docs.html` redirects to `docs.zh.html` or `docs.en.html` based on browser/site language preference; the API links on `zh.html` / `en.html` go straight to the matching language docs.
 
 ## 快速使用 / Quick start
 
@@ -89,6 +100,7 @@ endpoint file automatically — no manual steps needed.
 ## 页面 / Pages
 
 - [`index.html`](index.html) — 语言选择 / language picker
-- [`zh.html`](zh.html) / [`en.html`](en.html) — 域名列表 / domain lists
-- [`docs.html`](docs.html) — 接口文档 / API documentation
+- [`zh.html`](zh.html) / [`en.html`](en.html) — 域名列表 + API 入口 / domain lists with API links
+- [`docs.html`](docs.html) — 接口文档入口（自动按语言跳转）/ API docs entry (auto language routing)
+- [`docs.zh.html`](docs.zh.html) / [`docs.en.html`](docs.en.html) — 中文 / 英文接口文档 / Chinese / English API docs
 - [`go.html`](go.html) — 跳转主域名 / redirect to primary domain

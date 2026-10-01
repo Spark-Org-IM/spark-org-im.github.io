@@ -7,4 +7,9 @@
   </primary>
   <others>
   </others>
+  <labels>
+    <primary><zh>主域名</zh><en>Primary domains</en></primary>
+    <others><zh>备用域名</zh><en>Backup domains</en></others>
+    <primary_domain><zh>主域名（第一个 primary）</zh><en>Primary domain (first primary)</en></primary_domain>
+  </labels>
 </domains>

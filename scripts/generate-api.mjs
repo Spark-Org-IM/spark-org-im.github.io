@@ -98,7 +98,12 @@ function buildAll(domains) {
     '{\n' +
     '  "primary": [' + primary.map((d) => JSON.stringify(d)).join(', ') + '],\n' +
     '  "others": [' + others.map((d) => JSON.stringify(d)).join(', ') + '],\n' +
-    '  "primary_domain": ' + JSON.stringify(primaryDomain) + '\n' +
+    '  "primary_domain": ' + JSON.stringify(primaryDomain) + ',\n' +
+    '  "labels": {\n' +
+    '    "primary": { "zh": "主域名", "en": "Primary domains" },\n' +
+    '    "others": { "zh": "备用域名", "en": "Backup domains" },\n' +
+    '    "primary_domain": { "zh": "主域名（第一个 primary）", "en": "Primary domain (first primary)" }\n' +
+    '  }\n' +
     '}\n';
 
   /* ---- /api/domain.yaml 与 /api/domain.yml ---- */
@@ -109,14 +114,33 @@ function buildAll(domains) {
     primary.map((d) => '  - ' + d).join('\n') + (primary.length ? '\n' : '') +
     (others.length
       ? 'others:\n' + others.map((d) => '  - ' + d).join('\n') + '\n'
-      : 'others: []\n');
+      : 'others: []\n') +
+    'labels:\n' +
+    '  primary:\n' +
+    '    zh: 主域名\n' +
+    '    en: Primary domains\n' +
+    '  others:\n' +
+    '    zh: 备用域名\n' +
+    '    en: Backup domains\n' +
+    '  primary_domain:\n' +
+    '    zh: 主域名（第一个 primary）\n' +
+    '    en: Primary domain (first primary)\n';
 
   /* ---- /api/domain.toml ---- */
   const toml =
     '# SparkOrg · Domain API（由 scripts/generate-api.mjs 从 domain.txt 生成，请勿手工编辑）\n' +
     'primary_domain = ' + JSON.stringify(primaryDomain) + '\n' +
     'primary = [' + primary.map((d) => JSON.stringify(d)).join(', ') + ']\n' +
-    'others = [' + others.map((d) => JSON.stringify(d)).join(', ') + ']\n';
+    'others = [' + others.map((d) => JSON.stringify(d)).join(', ') + ']\n' +
+    '[labels.primary]\n' +
+    'zh = "主域名"\n' +
+    'en = "Primary domains"\n' +
+    '[labels.others]\n' +
+    'zh = "备用域名"\n' +
+    'en = "Backup domains"\n' +
+    '[labels.primary_domain]\n' +
+    'zh = "主域名（第一个 primary）"\n' +
+    'en = "Primary domain (first primary)"\n';
 
   /* ---- /api/domain.ini：多值以英文逗号分隔 ---- */
   const ini =
@@ -124,7 +148,14 @@ function buildAll(domains) {
     '[domains]\n' +
     'primary_domain = ' + primaryDomain + '\n' +
     'primary = ' + primary.join(',') + '\n' +
-    'others = ' + others.join(',') + '\n';
+    'others = ' + others.join(',') + '\n' +
+    '[labels]\n' +
+    'primary_zh = 主域名\n' +
+    'primary_en = Primary domains\n' +
+    'others_zh = 备用域名\n' +
+    'others_en = Backup domains\n' +
+    'primary_domain_zh = 主域名（第一个 primary）\n' +
+    'primary_domain_en = Primary domain (first primary)\n';
 
   /* ---- /api/domain.xml ---- */
   const xml =
@@ -138,6 +169,11 @@ function buildAll(domains) {
     '  <others>\n' +
     others.map((d) => '    <domain>' + escXml(d) + '</domain>').join('\n') + (others.length ? '\n' : '') +
     '  </others>\n' +
+    '  <labels>\n' +
+    '    <primary><zh>主域名</zh><en>Primary domains</en></primary>\n' +
+    '    <others><zh>备用域名</zh><en>Backup domains</en></others>\n' +
+    '    <primary_domain><zh>主域名（第一个 primary）</zh><en>Primary domain (first primary)</en></primary_domain>\n' +
+    '  </labels>\n' +
     '</domains>\n';
 
   /* ---- /api/domain.csv：列 role,domain ---- */
@@ -151,7 +187,13 @@ function buildAll(domains) {
     '# SparkOrg · Domain API（由 scripts/generate-api.mjs 从 domain.txt 生成，请勿手工编辑）\n' +
     'PRIMARY_DOMAIN=' + primaryDomain + '\n' +
     'PRIMARY=' + primary.join(',') + '\n' +
-    'OTHERS=' + others.join(',') + '\n';
+    'OTHERS=' + others.join(',') + '\n' +
+    'LABEL_PRIMARY_ZH=主域名\n' +
+    'LABEL_PRIMARY_EN=Primary domains\n' +
+    'LABEL_OTHERS_ZH=备用域名\n' +
+    'LABEL_OTHERS_EN=Backup domains\n' +
+    'LABEL_PRIMARY_DOMAIN_ZH=主域名（第一个 primary）\n' +
+    'LABEL_PRIMARY_DOMAIN_EN=Primary domain (first primary)\n';
 
   /* ---- /go.html：跳转页（烘焙兜底值 + 运行时实时读取 domain.txt） ---- */
   const goHtml =

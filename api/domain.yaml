@@ -3,3 +3,13 @@ primary_domain: sparkorg.dpdns.org
 primary:
   - sparkorg.dpdns.org
 others: []
+labels:
+  primary:
+    zh: 主域名
+    en: Primary domains
+  others:
+    zh: 备用域名
+    en: Backup domains
+  primary_domain:
+    zh: 主域名（第一个 primary）
+    en: Primary domain (first primary)

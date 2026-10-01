@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SparkOrg · API Documentation</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
+    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.12);
+    --warn:#f59e0b; --warn-soft:rgba(245,158,11,.12);
+    --ok:#22c55e;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px; border-bottom:1px solid var(--line);
+    position:sticky; top:0; background:rgba(15,17,23,.9);
+    backdrop-filter:blur(8px); z-index:10;
+  }
+  header .brand{font-size:15px; letter-spacing:1px; font-weight:600;}
+  header .brand span{color:var(--primary);}
+  .lang-switch{display:flex; gap:8px; font-size:13px; flex-wrap:wrap;}
+  .lang-switch a{
+    color:var(--muted); text-decoration:none; padding:4px 10px;
+    border-radius:6px; border:1px solid var(--line);
+  }
+  .lang-switch a.active{color:#fff; background:var(--primary); border-color:var(--primary);}
+  .lang-switch a:not(.active):hover{color:var(--text); border-color:var(--primary);}
+
+  main{max-width:860px; margin:0 auto; padding:32px 20px 60px;}
+  .page-title{font-size:22px; margin:0 0 4px;}
+  .page-sub{font-size:13px; color:var(--muted); margin:0 0 28px;}
+
+  .card{
+    background:var(--card); border:1px solid var(--line);
+    border-radius:16px; padding:22px 24px; margin-bottom:20px;
+  }
+  .card h2{font-size:16px; margin:0 0 12px;}
+  .card h2 .zh{color:var(--muted); font-weight:400; font-size:13px; margin-left:6px;}
+  .card p{font-size:14px; color:var(--muted); line-height:1.8; margin:8px 0;}
+  .card p strong{color:var(--text);}
+  .hl{color:var(--primary);}
+  code{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    background:rgba(59,130,246,.12); color:var(--primary);
+    padding:1px 6px; border-radius:5px; font-size:13px;
+  }
+  pre{
+    background:#12141b; border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; overflow-x:auto; margin:10px 0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px; line-height:1.7; color:var(--text);
+  }
+  pre code{background:none; color:inherit; padding:0;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px; margin-top:6px;}
+  th,td{text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top;}
+  th{color:var(--muted); font-weight:500; font-size:12px; letter-spacing:.5px; text-transform:uppercase;}
+  td.path{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--primary); white-space:nowrap;}
+  td.fmt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; color:var(--muted); white-space:nowrap; font-size:12.5px;}
+  tr:last-child td{border-bottom:none;}
+
+  .demo-btns{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 14px;}
+  .demo-btns button{
+    font:inherit; font-size:13px; color:var(--text); background:#1d212b;
+    border:1px solid var(--line); border-radius:8px; padding:7px 12px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .demo-btns button:hover{border-color:var(--primary); background:var(--primary-soft);}
+  .demo-btns button.active{border-color:var(--primary); color:var(--primary); background:var(--primary-soft);}
+  .demo-meta{font-size:12px; color:var(--muted); margin:0 0 8px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .demo-meta .ok{color:var(--ok);}
+  .demo-meta .err{color:var(--warn);}
+  .copy{
+    float:right; font:inherit; font-size:12px; color:var(--muted); background:none;
+    border:1px solid var(--line); border-radius:6px; padding:3px 9px; cursor:pointer;
+  }
+  .copy:hover{color:var(--text); border-color:var(--primary);}
+  .note{
+    border-left:3px solid var(--warn); background:var(--warn-soft);
+    border-radius:0 8px 8px 0; padding:10px 14px; font-size:13px;
+    color:var(--text); line-height:1.7; margin-top:14px;
+  }
+  .note b{color:var(--warn);}
+  .flow{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    font-size:13.5px; margin:10px 0;
+  }
+  .flow .step{
+    background:#1d212b; border:1px solid var(--line); border-radius:8px;
+    padding:8px 12px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .flow .arrow{color:var(--muted);}
+  footer{text-align:center; font-size:12px; color:var(--muted); padding:10px 0 40px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Spark<span>Org</span></div>
+  <nav class="lang-switch">
+    <a href="docs.zh.html">中文</a>
+    <a href="docs.en.html" class="active">English</a>
+    <a href="en.html">Domains</a>
+  </nav>
+</header>
+
+<main>
+  <h1 class="page-title">API Documentation</h1>
+  <p class="page-sub">One config file (domain.txt) → many API formats · English version; Chinese at docs.zh.html</p>
+
+  <!-- ===== Introduction ===== -->
+  <section class="card">
+    <h2>Introduction</h2>
+    <p>
+      This service is hosted on <strong>GitHub Pages (fully static)</strong>. The backend data is
+      <strong>a single file</strong> — <a href="domain.txt" class="hl"><code>domain.txt</code></a>.
+      Edit it and every endpoint updates. All “endpoints” are <strong>static files</strong> generated
+      from that one file — callable via browser, <code>curl</code>, <code>fetch</code>, <code>requests</code>.
+    </p>
+    <div class="flow">
+      <span class="step">domain.txt</span>
+      <span class="arrow">→</span>
+      <span class="step">scripts/generate-api.mjs</span>
+      <span class="arrow">→</span>
+      <span class="step">api/*.txt json yaml …</span>
+      <span class="arrow">+</span>
+      <span class="step">go.html</span>
+    </div>
+    <p>
+      How it flows: change one file → the generator emits every endpoint file → the GitHub Action
+      commits them automatically (or run the script locally). The redirect endpoint
+      <code>go.html</code> additionally reads <code>domain.txt</code> at runtime, so the redirect
+      target is always current even if generated files are stale.
+    </p>
+  </section>
+
+  <!-- ===== Endpoints ===== -->
+  <section class="card">
+    <h2>Endpoints</h2>
+    <p>Base URL: <code id="base-url">https://spark-org-im.github.io</code></p>
+    <table>
+      <thead>
+        <tr><th>Path</th><th>Format</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="path">/api/domain.txt</td>
+          <td class="fmt">text/plain</td>
+          <td><strong>Raw primary domain, no formatting</strong></td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.json</td>
+          <td class="fmt">application/json</td>
+          <td>JSON format (with bilingual <code>labels</code> field)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.yaml<br>/api/domain.yml</td>
+          <td class="fmt">text/yaml</td>
+          <td>YAML format (two equivalent paths, with bilingual labels)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.toml</td>
+          <td class="fmt">application/toml</td>
+          <td>TOML format (with bilingual labels)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.ini</td>
+          <td class="fmt">text/plain</td>
+          <td>INI format (comma-separated lists, with bilingual labels)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.xml</td>
+          <td class="fmt">application/xml</td>
+          <td>XML format (with bilingual labels)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.csv</td>
+          <td class="fmt">text/csv</td>
+          <td>CSV format, columns <code>role,domain</code> (pure data, no labels)</td>
+        </tr>
+        <tr>
+          <td class="path">/api/domain.env</td>
+          <td class="fmt">text/plain</td>
+          <td>dotenv env format (with LABEL_*_ZH / *_EN)</td>
+        </tr>
+        <tr>
+          <td class="path">/domain.txt</td>
+          <td class="fmt">text/plain</td>
+          <td>Full config file (all primary + other domains)</td>
+        </tr>
+        <tr>
+          <td class="path">/go.html</td>
+          <td class="fmt">redirect</td>
+          <td><strong>Redirect directly to the primary domain</strong>; supports <code>?to=other</code>, <code>?to=N</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>Note:</b> this is static hosting, so Content-Type is assigned by GitHub Pages per extension;
+      a few extensions (<code>.toml</code>/<code>.ini</code>/<code>.env</code>) may get a generic type —
+      <strong>the response body format is unaffected</strong>. Static hosting also cannot issue a real
+      HTTP 302; <code>go.html</code> uses meta refresh + JS as an equivalent.
+    </div>
+  </section>
+
+  <!-- ===== Multilingual Fields ===== -->
+  <section class="card">
+    <h2>Multilingual Fields</h2>
+    <p>
+      Data field names are English (<code>primary</code> / <code>others</code> / <code>primary_domain</code>).
+      Structured formats (JSON / YAML / TOML / INI / XML / ENV) include a
+      <strong>bilingual <code>labels</code> field</strong> so front-ends can display localized copy directly.
+      CSV is pure data and carries no labels.
+    </p>
+    <pre><code>{
+  "primary": ["sparkorg.dpdns.org"],
+  "others": [],
+  "primary_domain": "sparkorg.dpdns.org",
+  "labels": {
+    "primary": { "zh": "主域名", "en": "Primary domains" },
+    "others": { "zh": "备用域名", "en": "Backup domains" },
+    "primary_domain": { "zh": "主域名（第一个 primary）", "en": "Primary domain (first primary)" }
+  }
+}</code></pre>
+    <p>
+      Documentation is multilingual too: the root <code>docs.html</code> detects the browser language
+      or the site language preference (localStorage <code>lang</code>) and
+      <strong>redirects to this page (English) or docs.zh.html (Chinese)</strong>.
+    </p>
+  </section>
+
+  <!-- ===== Live Demo ===== -->
+  <section class="card">
+    <h2>Live Demo</h2>
+    <p>Click a button to request an endpoint on this site and see the response live (same-origin, no CORS setup needed).</p>
+    <div class="demo-btns" id="demo-btns"></div>
+    <div class="demo-meta" id="demo-meta">—</div>
+    <pre id="demo-out"><code>Click a button above to load a response…</code></pre>
+  </section>
+
+  <!-- ===== Examples ===== -->
+  <section class="card">
+    <h2>Examples</h2>
+
+    <p><strong>Shell / curl</strong></p>
+    <pre><code># Raw primary domain (no formatting)
+curl -s https://spark-org-im.github.io/api/domain.txt
+# => sparkorg.dpdns.org
+
+# JSON (with bilingual labels)
+curl -s https://spark-org-im.github.io/api/domain.json
+
+# YAML / TOML / XML / CSV / ENV
+curl -s https://spark-org-im.github.io/api/domain.yaml
+curl -s https://spark-org-im.github.io/api/domain.toml
+curl -s https://spark-org-im.github.io/api/domain.xml
+curl -s https://spark-org-im.github.io/api/domain.csv
+curl -s https://spark-org-im.github.io/api/domain.env
+
+# Full config file
+curl -s https://spark-org-im.github.io/domain.txt</code></pre>
+
+    <p><strong>JavaScript / fetch</strong></p>
+    <pre><code>// Raw primary domain
+const domain = await (await fetch('https://spark-org-im.github.io/api/domain.txt')).text();
+console.log(domain.trim()); // sparkorg.dpdns.org
+
+// JSON + bilingual copy
+const data = await (await fetch('https://spark-org-im.github.io/api/domain.json')).json();
+console.log(data.primary_domain);           // sparkorg.dpdns.org
+console.log(data.labels.primary.zh);        // 主域名
+console.log(data.labels.primary.en);        // Primary domains</code></pre>
+
+    <p><strong>Python / requests</strong></p>
+    <pre><code>import requests
+
+# Raw text
+domain = requests.get("https://spark-org-im.github.io/api/domain.txt").text.strip()
+print(domain)  # sparkorg.dpdns.org
+
+# JSON + bilingual copy
+data = requests.get("https://spark-org-im.github.io/api/domain.json").json()
+print(data["primary_domain"], data["labels"]["primary"]["en"])</code></pre>
+  </section>
+
+  <!-- ===== Redirect ===== -->
+  <section class="card">
+    <h2>Redirect Endpoint</h2>
+    <p>
+      Open <code>https://spark-org-im.github.io/go.html</code> in a browser to
+      <strong>redirect straight to the primary domain</strong>. The page prefers a runtime read of
+      <code>domain.txt</code> to pick the target; if that fails (or JS is off) it falls back to the
+      baked-in primary domain (meta refresh fallback).
+    </p>
+    <table>
+      <thead>
+        <tr><th>URL</th><th>Target</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="path">/go.html</td><td>Primary domain (default)</td></tr>
+        <tr><td class="path">/go.html?to=other</td><td>First backup domain (falls back to primary if none)</td></tr>
+        <tr><td class="path">/go.html?to=2</td><td>N-th domain (primary first, then other)</td></tr>
+      </tbody>
+    </table>
+    <div class="note">
+      <b>Tip:</b> the <code>?to=</code> parameter and live resolution require JavaScript;
+      without JS the page goes to the baked-in primary domain.
+    </div>
+  </section>
+
+  <!-- ===== Config & Sync ===== -->
+  <section class="card">
+    <h2>Config &amp; Sync</h2>
+    <p>
+      <strong>One file to change:</strong> edit <a href="domain.txt" class="hl"><code>domain.txt</code></a> —
+      <code>primary=</code> lines are main domains, <code>other=</code> lines are backups,
+      <code>#</code> starts a comment.
+    </p>
+    <table>
+      <thead>
+        <tr><th>Way</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>GitHub Action (automatic)</td>
+          <td>Push a change to <code>domain.txt</code>; <code>.github/workflows/api-sync.yml</code> regenerates and commits every endpoint file.</td>
+        </tr>
+        <tr>
+          <td>Local (manual)</td>
+          <td>Run <code>node scripts/generate-api.mjs</code>, then commit.</td>
+        </tr>
+        <tr>
+          <td>Redirect endpoint</td>
+          <td><code>go.html</code> reads <code>domain.txt</code> at runtime — <strong>always current, even without regenerating</strong>.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    Powered by a single config file: <a href="domain.txt" class="hl">domain.txt</a> · <a href="docs.zh.html" class="hl">中文</a>
+  </footer>
+</main>
+
+<script>
+/* ===== Live demo: request endpoints on this site directly ===== */
+var ENDPOINTS = [
+  { path: '/api/domain.txt', label: 'TXT raw' },
+  { path: '/api/domain.json', label: 'JSON' },
+  { path: '/api/domain.yaml', label: 'YAML' },
+  { path: '/api/domain.toml', label: 'TOML' },
+  { path: '/api/domain.ini', label: 'INI' },
+  { path: '/api/domain.xml', label: 'XML' },
+  { path: '/api/domain.csv', label: 'CSV' },
+  { path: '/api/domain.env', label: 'ENV' },
+  { path: '/domain.txt', label: 'Full config' }
+];
+
+var BASE = location.protocol + '//' + location.host;
+document.getElementById('base-url').textContent = BASE;
+
+var btnBox = document.getElementById('demo-btns');
+var metaEl = document.getElementById('demo-meta');
+var outEl  = document.getElementById('demo-out');
+var activeBtn = null;
+
+ENDPOINTS.forEach(function(ep){
+  var b = document.createElement('button');
+  b.textContent = ep.label;
+  b.addEventListener('click', function(){
+    if(activeBtn) activeBtn.classList.remove('active');
+    activeBtn = b;
+    b.classList.add('active');
+    runDemo(ep);
+  });
+  btnBox.appendChild(b);
+});
+
+function runDemo(ep){
+  metaEl.textContent = 'GET ' + ep.path + ' …';
+  outEl.innerHTML = '<code>Loading…</code>';
+  fetch(BASE + ep.path, { cache: 'no-store' })
+    .then(function(r){
+      return r.text().then(function(body){
+        var ct = r.headers.get('content-type') || '(unknown)';
+        var cls = r.ok ? 'ok' : 'err';
+        metaEl.innerHTML = 'GET ' + ep.path + ' → <span class="' + cls + '">' + r.status + '</span> · Content-Type: ' + ct + ' · ' + body.length + ' bytes';
+        outEl.innerHTML = '';
+        var bar = document.createElement('div');
+        var copyBtn = document.createElement('button');
+        copyBtn.className = 'copy';
+        copyBtn.textContent = 'Copy';
+        copyBtn.addEventListener('click', function(){ copyText(body, copyBtn); });
+        bar.appendChild(copyBtn);
+        var pre = document.createElement('pre');
+        var code = document.createElement('code');
+        code.textContent = body;
+        pre.appendChild(code);
+        outEl.appendChild(pre);
+        outEl.appendChild(bar);
+      });
+    })
+    .catch(function(e){
+      metaEl.innerHTML = 'GET ' + ep.path + ' → <span class="err">failed</span>';
+      outEl.innerHTML = '<code>' + String(e) + '</code>';
+    });
+}
+
+function copyText(text, btn){
+  var done = function(){
+    var old = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(function(){ btn.textContent = old; }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+
+function fallbackCopy(text, done){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); done(); }catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
+
+</body>
+</html>
