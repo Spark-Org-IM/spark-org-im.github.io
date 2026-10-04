@@ -21,7 +21,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /** 与 index / zh / en 页面内联逻辑保持一致的兜底配置 */
 const DEFAULT_DOMAINS = {
   primary: ['sparkorg.dpdns.org'],
-  others: ['sparkorg.cc.cd'],
+  others: [],
 };
 
 /* ---------------- 解析 domain.txt（与页面端逻辑一致） ---------------- */
@@ -270,7 +270,7 @@ function parseDomains(text){
     if(key === 'primary') primary.push(val);
     else if(key === 'other') others.push(val);
   });
-  if(!primary.length && !others.length) return { primary: ['sparkorg.dpdns.org'], others: ['sparkorg.cc.cd'] };
+  if(!primary.length && !others.length) return { primary: ['sparkorg.dpdns.org'], others: [] };
   return { primary: primary, others: others };
 }
 

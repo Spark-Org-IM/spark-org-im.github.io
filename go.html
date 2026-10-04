@@ -71,7 +71,7 @@ function parseDomains(text){
     if(key === 'primary') primary.push(val);
     else if(key === 'other') others.push(val);
   });
-  if(!primary.length && !others.length) return { primary: ['sparkorg.dpdns.org'], others: ['sparkorg.cc.cd'] };
+  if(!primary.length && !others.length) return { primary: ['sparkorg.dpdns.org'], others: [] };
   return { primary: primary, others: others };
 }
 
