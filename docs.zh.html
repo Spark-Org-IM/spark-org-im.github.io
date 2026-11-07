@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SparkOrg · 接口文档</title>
+<title>SparkOrg · 服务接口文档</title>
 <style>
   :root{
     --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
@@ -106,35 +106,67 @@
   <nav class="lang-switch">
     <a href="docs.zh.html" class="active">中文</a>
     <a href="docs.en.html">English</a>
-    <a href="zh.html">域名页</a>
+    <a href="zh.html">服务页</a>
   </nav>
 </header>
 
 <main>
-  <h1 class="page-title">接口文档</h1>
-  <p class="page-sub">单一配置文件（domain.txt）→ 多种接口格式 · 本页为中文版，英文版见 docs.en.html</p>
+  <h1 class="page-title">服务接口文档</h1>
+  <p class="page-sub">单一配置文件（services.toml）→ 多种接口格式 · 本页为中文版，英文版见 docs.en.html</p>
 
   <!-- ===== 简介 ===== -->
   <section class="card">
     <h2>简介</h2>
     <p>
       本服务托管于 <strong>GitHub Pages（纯静态）</strong>。后台数据<strong>只有一个文件</strong>——
-      <a href="domain.txt" class="hl"><code>domain.txt</code></a>，编辑它即可更新全部数据；
+      <a href="services.toml" class="hl"><code>services.toml</code></a>，编辑它即可更新全部数据；
       所有“接口”都是由它生成的<strong>静态文件</strong>，可直接用浏览器、<code>curl</code>、<code>fetch</code>、<code>requests</code> 调用。
     </p>
+    <p>
+      每个服务变量（如 <code>HOME</code>、<code>FORUM</code>、<code>GIT</code>、<code>STATUS</code>）只对应<strong>一个域名</strong>；
+      值为空表示该服务未配置，不会出现在接口与页面中。
+    </p>
     <div class="flow">
-      <span class="step">domain.txt</span>
+      <span class="step">services.toml</span>
       <span class="arrow">→</span>
       <span class="step">scripts/generate-api.mjs</span>
       <span class="arrow">→</span>
-      <span class="step">api/*.txt json yaml …</span>
+      <span class="step">api/services.*</span>
+      <span class="arrow">+</span>
+      <span class="step">api/home.txt</span>
       <span class="arrow">+</span>
       <span class="step">go.html</span>
     </div>
     <p>
       数据流向：改一个文件 → 生成器产出所有接口文件 → GitHub Action 自动提交（或本地手动运行脚本）。
-      跳转接口 <code>go.html</code> 额外支持运行时实时读取 <code>domain.txt</code>，因此即使生成文件未刷新，跳转也始终用最新配置。
+      跳转接口 <code>go.html</code> 额外支持运行时实时读取 <code>services.toml</code>，因此即使生成文件未刷新，跳转也始终用最新配置。
     </p>
+  </section>
+
+  <!-- ===== 配置 ===== -->
+  <section class="card">
+    <h2>配置 <span class="en">services.toml</span></h2>
+    <p>
+      在 <a href="services.toml" class="hl"><code>services.toml</code></a> 中定义服务变量：
+    </p>
+    <pre><code>[services]
+HOME = "sparkorg.dpdns.org"
+FORUM = "forum.sparkorg.dpdns.org"
+GIT = "git.sparkorg.dpdns.org"
+STATUS = "status.sparkorg.dpdns.org"
+CLOUD_ST = ""</code></pre>
+    <p>
+      值为空字符串表示<strong>未配置</strong>（例如上面的 <code>CLOUD_ST</code>），生成器会跳过它。
+      新增服务只需加一行，例如 <code>BLOG = "blog.example.com"</code>。
+    </p>
+    <p>
+      还可以为每个服务配置显示名称与说明（可选，未配置时自动使用变量名）：
+    </p>
+    <pre><code>[labels.HOME]
+zh = "主页"
+en = "Home"
+desc_zh = "SparkOrg 主站入口"
+desc_en = "SparkOrg main site"</code></pre>
   </section>
 
   <!-- ===== 接口列表 ===== -->
@@ -147,54 +179,59 @@
       </thead>
       <tbody>
         <tr>
-          <td class="path">/api/domain.txt</td>
+          <td class="path">/api/services.txt</td>
           <td class="fmt">text/plain</td>
-          <td><strong>主域名，纯文本，无任何格式</strong></td>
+          <td><strong>全部服务，纯文本</strong>，每行 <code>KEY=域名</code></td>
         </tr>
         <tr>
-          <td class="path">/api/domain.json</td>
+          <td class="path">/api/services.json</td>
           <td class="fmt">application/json</td>
-          <td>JSON 格式（含双语 <code>labels</code> 字段）</td>
+          <td>JSON 格式（含双语 <code>labels</code> 与 <code>disabled</code>）</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.yaml<br>/api/domain.yml</td>
+          <td class="path">/api/services.yaml<br>/api/services.yml</td>
           <td class="fmt">text/yaml</td>
-          <td>YAML 格式（两个路径等价，含双语 labels）</td>
+          <td>YAML 格式（两个路径等价）</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.toml</td>
+          <td class="path">/api/services.toml</td>
           <td class="fmt">application/toml</td>
-          <td>TOML 格式（含双语 labels）</td>
+          <td>TOML 格式</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.ini</td>
+          <td class="path">/api/services.ini</td>
           <td class="fmt">text/plain</td>
-          <td>INI 格式（多值逗号分隔，含双语 labels）</td>
+          <td>INI 格式</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.xml</td>
+          <td class="path">/api/services.xml</td>
           <td class="fmt">application/xml</td>
-          <td>XML 格式（含双语 labels）</td>
+          <td>XML 格式</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.csv</td>
+          <td class="path">/api/services.csv</td>
           <td class="fmt">text/csv</td>
-          <td>CSV 格式，列：<code>role,domain</code>（纯数据，不含 labels）</td>
+          <td>CSV 格式，列：<code>service,domain</code></td>
         </tr>
         <tr>
-          <td class="path">/api/domain.env</td>
+          <td class="path">/api/services.env</td>
           <td class="fmt">text/plain</td>
-          <td>dotenv 环境变量格式（含 LABEL_*_ZH / *_EN）</td>
+          <td>dotenv 环境变量格式</td>
         </tr>
         <tr>
-          <td class="path">/domain.txt</td>
+          <td class="path">/api/home.txt</td>
           <td class="fmt">text/plain</td>
-          <td>完整配置文件（primary + other 全部）</td>
+          <td><strong>主页域名（HOME）</strong>，纯文本，无任何格式</td>
+        </tr>
+        <tr>
+          <td class="path">/services.toml</td>
+          <td class="fmt">text/plain</td>
+          <td>完整配置文件（服务变量 + 可选的 labels）</td>
         </tr>
         <tr>
           <td class="path">/go.html</td>
           <td class="fmt">redirect</td>
-          <td><strong>直接跳转主域名</strong>；支持 <code>?to=other</code>、<code>?to=N</code></td>
+          <td><strong>跳转服务</strong>；默认 HOME，支持 <code>?to=FORUM</code> 等</td>
         </tr>
       </tbody>
     </table>
@@ -202,26 +239,36 @@
       <b>说明：</b>本站为静态托管，Content-Type 由 GitHub Pages 按扩展名给出；
       个别扩展名（如 <code>.toml</code>/<code>.ini</code>/<code>.env</code>）可能被标为通用类型，<strong>响应体格式不受影响</strong>。
       静态站无法返回真正的 HTTP 302，<code>go.html</code> 用 meta refresh + JS 实现等效跳转。
+      <br><code>/api/domain.txt</code> 作为 <code>/api/home.txt</code> 的兼容别名保留。
     </div>
   </section>
 
-  <!-- ===== 多语言字段 ===== -->
+  <!-- ===== 数据格式 ===== -->
   <section class="card">
-    <h2>多语言字段</h2>
+    <h2>数据格式</h2>
     <p>
-      接口数据字段名为英文（<code>primary</code> / <code>others</code> / <code>primary_domain</code>）；
-      结构化格式（JSON / YAML / TOML / INI / XML / ENV）的响应中附带<strong>中英双语的 <code>labels</code> 字段</strong>，
-      前端可直接取用本地化文案。CSV 为纯数据格式，不含 labels。
+      接口字段名为英文；<code>services</code> 是“变量名 → 域名”的映射，
+      <code>home</code> 是主页变量名，<code>home_domain</code> 是对应的域名，
+      <code>labels</code> 提供中英双语的显示名称与说明，<code>disabled</code> 列出配置为空的服务。
     </p>
     <pre><code>{
-  "primary": ["sparkorg.dpdns.org"],
-  "others": [],
-  "primary_domain": "sparkorg.dpdns.org",
+  "home": "HOME",
+  "home_domain": "sparkorg.dpdns.org",
+  "services": {
+    "HOME": "sparkorg.dpdns.org",
+    "FORUM": "forum.sparkorg.dpdns.org",
+    "GIT": "git.sparkorg.dpdns.org",
+    "STATUS": "status.sparkorg.dpdns.org"
+  },
   "labels": {
-    "primary": { "zh": "主域名", "en": "Primary domains" },
-    "others": { "zh": "备用域名", "en": "Backup domains" },
-    "primary_domain": { "zh": "主域名（第一个 primary）", "en": "Primary domain (first primary)" }
-  }
+    "HOME": {
+      "zh": "主页",
+      "en": "Home",
+      "desc_zh": "SparkOrg 主站入口",
+      "desc_en": "SparkOrg main site"
+    }
+  },
+  "disabled": ["CLOUD_ST"]
 }</code></pre>
     <p>
       文档本身也分语言：根目录 <code>docs.html</code> 会根据浏览器语言或站点语言偏好（localStorage <code>lang</code>），
@@ -243,65 +290,73 @@
     <h2>使用示例</h2>
 
     <p><strong>Shell / curl</strong></p>
-    <pre><code># 主域名，纯文本（无格式）
-curl -s https://spark-org-im.github.io/api/domain.txt
+    <pre><code># 全部服务，纯文本（每行 KEY=域名）
+curl -s https://spark-org-im.github.io/api/services.txt
+# => HOME=sparkorg.dpdns.org
+#    FORUM=forum.sparkorg.dpdns.org
+#    ...
+
+# 主页域名，纯文本
+curl -s https://spark-org-im.github.io/api/home.txt
 # => sparkorg.dpdns.org
 
 # JSON（含双语 labels）
-curl -s https://spark-org-im.github.io/api/domain.json
+curl -s https://spark-org-im.github.io/api/services.json
 
 # YAML / TOML / XML / CSV / ENV
-curl -s https://spark-org-im.github.io/api/domain.yaml
-curl -s https://spark-org-im.github.io/api/domain.toml
-curl -s https://spark-org-im.github.io/api/domain.xml
-curl -s https://spark-org-im.github.io/api/domain.csv
-curl -s https://spark-org-im.github.io/api/domain.env
+curl -s https://spark-org-im.github.io/api/services.yaml
+curl -s https://spark-org-im.github.io/api/services.toml
+curl -s https://spark-org-im.github.io/api/services.xml
+curl -s https://spark-org-im.github.io/api/services.csv
+curl -s https://spark-org-im.github.io/api/services.env
 
 # 完整配置文件
-curl -s https://spark-org-im.github.io/domain.txt</code></pre>
+curl -s https://spark-org-im.github.io/services.toml</code></pre>
 
     <p><strong>JavaScript / fetch</strong></p>
-    <pre><code>// 纯文本主域名
-const domain = await (await fetch('https://spark-org-im.github.io/api/domain.txt')).text();
-console.log(domain.trim()); // sparkorg.dpdns.org
+    <pre><code>// 全部服务
+const data = await (await fetch('https://spark-org-im.github.io/api/services.json')).json();
+console.log(data.home_domain);              // sparkorg.dpdns.org
+console.log(data.services.FORUM);           // forum.sparkorg.dpdns.org
+console.log(data.services.STATUS);          // status.sparkorg.dpdns.org
+console.log(data.labels.FORUM.zh);          // 论坛
+console.log(data.disabled);                 // ["CLOUD_ST"]
 
-// JSON + 双语文案
-const data = await (await fetch('https://spark-org-im.github.io/api/domain.json')).json();
-console.log(data.primary_domain);           // sparkorg.dpdns.org
-console.log(data.labels.primary.zh);        // 主域名
-console.log(data.labels.primary.en);        // Primary domains</code></pre>
+// 只要主页域名
+const home = await (await fetch('https://spark-org-im.github.io/api/home.txt')).text();
+console.log(home.trim());                   // sparkorg.dpdns.org</code></pre>
 
     <p><strong>Python / requests</strong></p>
     <pre><code>import requests
 
-# 纯文本
-domain = requests.get("https://spark-org-im.github.io/api/domain.txt").text.strip()
-print(domain)  # sparkorg.dpdns.org
-
-# JSON + 双语文案
-data = requests.get("https://spark-org-im.github.io/api/domain.json").json()
-print(data["primary_domain"], data["labels"]["primary"]["zh"])</code></pre>
+data = requests.get("https://spark-org-im.github.io/api/services.json").json()
+print(data["home_domain"])                  # sparkorg.dpdns.org
+print(data["services"]["GIT"])              # git.sparkorg.dpdns.org
+print(data["labels"]["GIT"]["zh"])          # Git 服务</code></pre>
   </section>
 
   <!-- ===== 跳转接口 ===== -->
   <section class="card">
     <h2>跳转接口</h2>
     <p>
-      浏览器打开 <code>https://spark-org-im.github.io/go.html</code> 即可<strong>直接跳转到主域名</strong>。
-      页面优先实时读取 <code>domain.txt</code> 动态决定跳转目标；若读取失败或 JS 不可用，回退到生成时烘焙的主域名（meta refresh 兜底）。
+      浏览器打开 <code>https://spark-org-im.github.io/go.html</code> 即可<strong>直接跳转到 HOME</strong>。
+      页面优先实时读取 <code>services.toml</code> 动态决定跳转目标；若读取失败或 JS 不可用，回退到生成时烘焙的 HOME（meta refresh 兜底）。
     </p>
     <table>
       <thead>
         <tr><th>地址</th><th>目标</th></tr>
       </thead>
       <tbody>
-        <tr><td class="path">/go.html</td><td>主域名（默认）</td></tr>
-        <tr><td class="path">/go.html?to=other</td><td>第一个备用域名（无备用则回退主域名）</td></tr>
-        <tr><td class="path">/go.html?to=2</td><td>第 N 个域名（primary 优先，其次 other）</td></tr>
+        <tr><td class="path">/go.html</td><td>HOME（默认）</td></tr>
+        <tr><td class="path">/go.html?to=FORUM</td><td>FORUM</td></tr>
+        <tr><td class="path">/go.html?to=GIT</td><td>GIT</td></tr>
+        <tr><td class="path">/go.html?to=STATUS</td><td>STATUS</td></tr>
+        <tr><td class="path">/go.html?to=2</td><td>第 N 个已配置服务（按配置顺序）</td></tr>
+        <tr><td class="path">/go.html?to=other</td><td>第一个非 HOME 服务（兼容旧参数）</td></tr>
       </tbody>
     </table>
     <div class="note">
-      <b>提示：</b><code>?to=</code> 参数与实时读取均依赖 JavaScript；禁用 JS 时只会跳转到生成时的主域名。
+      <b>提示：</b>如果指定的服务未配置，会回退到 HOME；<code>?to=</code> 参数与实时读取均依赖 JavaScript。
     </div>
   </section>
 
@@ -309,8 +364,8 @@ print(data["primary_domain"], data["labels"]["primary"]["zh"])</code></pre>
   <section class="card">
     <h2>配置与同步</h2>
     <p>
-      <strong>只改一个文件：</strong>编辑 <a href="domain.txt" class="hl"><code>domain.txt</code></a>，
-      <code>primary=</code> 为多行主域名，<code>other=</code> 为多行备用域名，<code>#</code> 开头为注释。
+      <strong>只改一个文件：</strong>编辑 <a href="services.toml" class="hl"><code>services.toml</code></a>，
+      在 <code>[services]</code> 中增删变量即可；值留空表示不启用该服务。
     </p>
     <table>
       <thead>
@@ -319,7 +374,7 @@ print(data["primary_domain"], data["labels"]["primary"]["zh"])</code></pre>
       <tbody>
         <tr>
           <td>GitHub Action（自动）</td>
-          <td>推送 <code>domain.txt</code> 变更后，<code>.github/workflows/api-sync.yml</code> 自动运行生成器并提交所有接口文件。</td>
+          <td>推送 <code>services.toml</code> 变更后，<code>.github/workflows/api-sync.yml</code> 自动运行生成器并提交所有接口文件。</td>
         </tr>
         <tr>
           <td>本地手动</td>
@@ -327,29 +382,30 @@ print(data["primary_domain"], data["labels"]["primary"]["zh"])</code></pre>
         </tr>
         <tr>
           <td>跳转接口</td>
-          <td><code>go.html</code> 运行时读取 <code>domain.txt</code>，<strong>无需生成也始终最新</strong>。</td>
+          <td><code>go.html</code> 运行时读取 <code>services.toml</code>，<strong>无需生成也始终最新</strong>。</td>
         </tr>
       </tbody>
     </table>
   </section>
 
   <footer>
-    由 <a href="domain.txt" class="hl">domain.txt</a> 单一配置驱动 · <a href="docs.en.html" class="hl">English</a>
+    由 <a href="services.toml" class="hl">services.toml</a> 单一配置驱动 · <a href="docs.en.html" class="hl">English</a>
   </footer>
 </main>
 
 <script>
 /* ===== 在线演示：直接请求本站静态接口 ===== */
 var ENDPOINTS = [
-  { path: '/api/domain.txt', label: 'TXT 纯文本' },
-  { path: '/api/domain.json', label: 'JSON' },
-  { path: '/api/domain.yaml', label: 'YAML' },
-  { path: '/api/domain.toml', label: 'TOML' },
-  { path: '/api/domain.ini', label: 'INI' },
-  { path: '/api/domain.xml', label: 'XML' },
-  { path: '/api/domain.csv', label: 'CSV' },
-  { path: '/api/domain.env', label: 'ENV' },
-  { path: '/domain.txt', label: '完整配置' }
+  { path: '/api/services.txt', label: 'TXT 纯文本' },
+  { path: '/api/services.json', label: 'JSON' },
+  { path: '/api/services.yaml', label: 'YAML' },
+  { path: '/api/services.toml', label: 'TOML' },
+  { path: '/api/services.ini', label: 'INI' },
+  { path: '/api/services.xml', label: 'XML' },
+  { path: '/api/services.csv', label: 'CSV' },
+  { path: '/api/services.env', label: 'ENV' },
+  { path: '/api/home.txt', label: 'HOME 纯文本' },
+  { path: '/services.toml', label: '完整配置' }
 ];
 
 var BASE = location.protocol + '//' + location.host;

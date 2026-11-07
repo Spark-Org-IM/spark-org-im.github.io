@@ -1,0 +1,50 @@
+# ============================================
+# SparkOrg · 服务域名配置 / Service domains
+# ============================================
+# 一个变量 = 一个服务 = 一个域名。
+# 值留空表示该服务未配置，不会出现在接口和页面中。
+# 新增服务只需在 [services] 里加一行，例如：
+#   BLOG = "blog.example.com"
+# ============================================
+
+[services]
+HOME = "sparkorg.dpdns.org"
+FORUM = "forum.sparkorg.dpdns.org"
+GIT = "git.sparkorg.dpdns.org"
+STATUS = "status.sparkorg.dpdns.org"
+CLOUD_ST = ""
+
+# --------------------------------------------
+# 可选：显示名称与说明
+# 未配置的项会自动使用变量名作为兜底
+# --------------------------------------------
+
+[labels.HOME]
+zh = "主页"
+en = "Home"
+desc_zh = "SparkOrg 主站入口"
+desc_en = "SparkOrg main site"
+
+[labels.FORUM]
+zh = "论坛"
+en = "Forum"
+desc_zh = "社区交流与讨论"
+desc_en = "Community discussion forum"
+
+[labels.GIT]
+zh = "Git 服务"
+en = "Git"
+desc_zh = "代码托管与仓库服务"
+desc_en = "Source code hosting service"
+
+[labels.STATUS]
+zh = "状态页"
+en = "Status"
+desc_zh = "各服务的运行状态与公告"
+desc_en = "Service status and announcements"
+
+[labels.CLOUD_ST]
+zh = "云服务状态"
+en = "Cloud Status"
+desc_zh = "云平台运行状态"
+desc_en = "Cloud platform status"

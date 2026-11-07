@@ -39,7 +39,7 @@
   }
   .preview .dom{
     display:flex; justify-content:space-between; align-items:center; gap:10px;
-    padding:6px 0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    padding:7px 0; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
     word-break:break-all;
   }
   .preview .dom + .dom{border-top:1px dashed var(--line);}
@@ -47,8 +47,13 @@
     flex-shrink:0; font-size:11px; padding:2px 8px; border-radius:999px;
   }
   .role.main{color:var(--primary); background:var(--primary-soft);}
-  .role.other{color:var(--warn); background:var(--warn-soft);}
+  .role.service{color:var(--muted); background:rgba(154,160,170,.12);}
+  .preview .empty{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size:11px; color:var(--muted);
+  }
   .tip{margin-top:20px; font-size:12px; color:var(--muted); line-height:1.6;}
+  .tip a{color:var(--primary);}
 </style>
 </head>
 <body>
@@ -64,8 +69,8 @@
   </div>
 
   <div class="preview">
-    <div class="preview-title">当前域名 · Domains</div>
-    <div id="domains">加载中… / Loading…</div>
+    <div class="preview-title">当前服务 · Services</div>
+    <div id="services">加载中… / Loading…</div>
   </div>
 
   <p class="tip">
@@ -75,49 +80,49 @@
 
   <p class="tip">
     <a href="docs.html">API 文档 / API Docs</a> ·
-    <a href="go.html">跳转主域名 / Go to primary</a>
+    <a href="go.html">跳转主页 / Go to home</a>
   </p>
 </div>
 
 <script>
-/* ===== 域名配置读取（三个页面共用同一段逻辑） ===== */
-var DEFAULT_DOMAINS = { primary: ['sparkorg.dpdns.org'], others: [] };
+/* ===== 服务配置读取（读取生成后的 api/services.json） ===== */
+var DEFAULT_DATA = {
+  home: 'HOME',
+  home_domain: 'sparkorg.dpdns.org',
+  services: { HOME: 'sparkorg.dpdns.org' },
+  labels: {
+    HOME: { zh: '主页', en: 'Home', desc_zh: 'SparkOrg 主站入口', desc_en: 'SparkOrg main site' }
+  },
+  disabled: []
+};
 
-function parseDomains(text){
-  var primary = [], others = [];
-  text.split(/\r?\n/).forEach(function(line){
-    line = line.trim();
-    if(!line || line.charAt(0) === '#') return;
-    var i = line.indexOf('=');
-    if(i < 0) return;
-    var key = line.slice(0, i).trim().toLowerCase();
-    var val = line.slice(i + 1).trim();
-    if(!val) return;
-    if(key === 'primary') primary.push(val);
-    else if(key === 'other') others.push(val);
-  });
-  if(!primary.length && !others.length) return DEFAULT_DOMAINS;
-  return { primary: primary, others: others };
+function loadServices(cb){
+  if(!window.fetch){ cb(DEFAULT_DATA); return; }
+  fetch('api/services.json', { cache: 'no-store' })
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(data){ cb(data); })
+    .catch(function(){ cb(DEFAULT_DATA); });
 }
 
-function loadDomains(cb){
-  if(!window.fetch){ cb(DEFAULT_DOMAINS); return; }
-  fetch('domain.txt')
-    .then(function(r){ if(!r.ok) throw 0; return r.text(); })
-    .then(function(t){ cb(parseDomains(t)); })
-    .catch(function(){ cb(DEFAULT_DOMAINS); });
+function metaFor(data, key){
+  return (data.labels && data.labels[key]) || { zh: key, en: key, desc_zh: '', desc_en: '' };
 }
-/* ===== 域名配置读取结束 ===== */
+/* ===== 服务配置读取结束 ===== */
 
-loadDomains(function(d){
+loadServices(function(data){
   var html = '';
-  d.primary.forEach(function(v){
-    html += '<div class="dom"><span>' + v + '</span><span class="role main">主 / Main</span></div>';
+  Object.keys(data.services || {}).forEach(function(key){
+    var meta = metaFor(data, key);
+    var isHome = key === data.home;
+    html += '<div class="dom"><span>' + data.services[key] + '</span>'
+          + '<span class="role ' + (isHome ? 'main' : 'service') + '">'
+          + (isHome ? '主 / Main' : (meta.zh + ' / ' + meta.en))
+          + '</span></div>';
   });
-  d.others.forEach(function(v){
-    html += '<div class="dom"><span>' + v + '</span><span class="role other">备用 / Backup</span></div>';
-  });
-  document.getElementById('domains').innerHTML = html || '（未配置域名）';
+  if((data.disabled || []).length){
+    html += '<div class="empty">未配置 / Not configured：' + data.disabled.join(', ') + '</div>';
+  }
+  document.getElementById('services').innerHTML = html || '（未配置服务）';
 });
 
 /* 语言识别 + 跳转 */

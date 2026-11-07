@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SparkOrg · API Documentation</title>
+<title>SparkOrg · Service API Documentation</title>
 <style>
   :root{
     --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
@@ -41,7 +41,7 @@
     border-radius:16px; padding:22px 24px; margin-bottom:20px;
   }
   .card h2{font-size:16px; margin:0 0 12px;}
-  .card h2 .zh{color:var(--muted); font-weight:400; font-size:13px; margin-left:6px;}
+  .card h2 .en{color:var(--muted); font-weight:400; font-size:13px; margin-left:6px;}
   .card p{font-size:14px; color:var(--muted); line-height:1.8; margin:8px 0;}
   .card p strong{color:var(--text);}
   .hl{color:var(--primary);}
@@ -106,38 +106,70 @@
   <nav class="lang-switch">
     <a href="docs.zh.html">中文</a>
     <a href="docs.en.html" class="active">English</a>
-    <a href="en.html">Domains</a>
+    <a href="en.html">Services</a>
   </nav>
 </header>
 
 <main>
-  <h1 class="page-title">API Documentation</h1>
-  <p class="page-sub">One config file (domain.txt) → many API formats · English version; Chinese at docs.zh.html</p>
+  <h1 class="page-title">Service API Documentation</h1>
+  <p class="page-sub">Single config file (services.toml) → multiple API formats · English docs; see docs.zh.html for Chinese</p>
 
   <!-- ===== Introduction ===== -->
   <section class="card">
     <h2>Introduction</h2>
     <p>
       This service is hosted on <strong>GitHub Pages (fully static)</strong>. The backend data is
-      <strong>a single file</strong> — <a href="domain.txt" class="hl"><code>domain.txt</code></a>.
-      Edit it and every endpoint updates. All “endpoints” are <strong>static files</strong> generated
-      from that one file — callable via browser, <code>curl</code>, <code>fetch</code>, <code>requests</code>.
+      <strong>a single file</strong> — <a href="services.toml" class="hl"><code>services.toml</code></a>.
+      Edit it and every endpoint updates. All “APIs” are generated <strong>static files</strong> that can be
+      consumed with a browser, <code>curl</code>, <code>fetch</code>, or <code>requests</code>.
+    </p>
+    <p>
+      Each service variable (<code>HOME</code>, <code>FORUM</code>, <code>GIT</code>, <code>STATUS</code>, …)
+      maps to <strong>exactly one domain</strong>. An empty value means the service is not configured and is
+      omitted from the API and pages.
     </p>
     <div class="flow">
-      <span class="step">domain.txt</span>
+      <span class="step">services.toml</span>
       <span class="arrow">→</span>
       <span class="step">scripts/generate-api.mjs</span>
       <span class="arrow">→</span>
-      <span class="step">api/*.txt json yaml …</span>
+      <span class="step">api/services.*</span>
+      <span class="arrow">+</span>
+      <span class="step">api/home.txt</span>
       <span class="arrow">+</span>
       <span class="step">go.html</span>
     </div>
     <p>
-      How it flows: change one file → the generator emits every endpoint file → the GitHub Action
-      commits them automatically (or run the script locally). The redirect endpoint
-      <code>go.html</code> additionally reads <code>domain.txt</code> at runtime, so the redirect
-      target is always current even if generated files are stale.
+      Data flow: edit one file → the generator produces every endpoint → the GitHub Action commits the result
+      (or run the script locally). The redirect page <code>go.html</code> also reads <code>services.toml</code>
+      at runtime, so redirects stay current even before generated files are refreshed.
     </p>
+  </section>
+
+  <!-- ===== Configuration ===== -->
+  <section class="card">
+    <h2>Configuration <span class="en">services.toml</span></h2>
+    <p>
+      Define service variables in <a href="services.toml" class="hl"><code>services.toml</code></a>:
+    </p>
+    <pre><code>[services]
+HOME = "sparkorg.dpdns.org"
+FORUM = "forum.sparkorg.dpdns.org"
+GIT = "git.sparkorg.dpdns.org"
+STATUS = "status.sparkorg.dpdns.org"
+CLOUD_ST = ""</code></pre>
+    <p>
+      An empty string means <strong>not configured</strong> (e.g. <code>CLOUD_ST</code> above);
+      the generator skips it. To add a service, add one line, e.g. <code>BLOG = "blog.example.com"</code>.
+    </p>
+    <p>
+      You can optionally provide display names and descriptions for each service (defaults to the variable name):
+    </p>
+    <pre><code>[labels.HOME]
+zh = "主页"
+en = "Home"
+desc_zh = "SparkOrg 主站入口"
+desc_en = "SparkOrg main site"</code></pre>
   </section>
 
   <!-- ===== Endpoints ===== -->
@@ -150,98 +182,112 @@
       </thead>
       <tbody>
         <tr>
-          <td class="path">/api/domain.txt</td>
+          <td class="path">/api/services.txt</td>
           <td class="fmt">text/plain</td>
-          <td><strong>Raw primary domain, no formatting</strong></td>
+          <td><strong>All services, plain text</strong>, one <code>KEY=domain</code> per line</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.json</td>
+          <td class="path">/api/services.json</td>
           <td class="fmt">application/json</td>
-          <td>JSON format (with bilingual <code>labels</code> field)</td>
+          <td>JSON (bilingual <code>labels</code> + <code>disabled</code>)</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.yaml<br>/api/domain.yml</td>
+          <td class="path">/api/services.yaml<br>/api/services.yml</td>
           <td class="fmt">text/yaml</td>
-          <td>YAML format (two equivalent paths, with bilingual labels)</td>
+          <td>YAML (both paths are equivalent)</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.toml</td>
+          <td class="path">/api/services.toml</td>
           <td class="fmt">application/toml</td>
-          <td>TOML format (with bilingual labels)</td>
+          <td>TOML</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.ini</td>
+          <td class="path">/api/services.ini</td>
           <td class="fmt">text/plain</td>
-          <td>INI format (comma-separated lists, with bilingual labels)</td>
+          <td>INI</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.xml</td>
+          <td class="path">/api/services.xml</td>
           <td class="fmt">application/xml</td>
-          <td>XML format (with bilingual labels)</td>
+          <td>XML</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.csv</td>
+          <td class="path">/api/services.csv</td>
           <td class="fmt">text/csv</td>
-          <td>CSV format, columns <code>role,domain</code> (pure data, no labels)</td>
+          <td>CSV with <code>service,domain</code> columns</td>
         </tr>
         <tr>
-          <td class="path">/api/domain.env</td>
+          <td class="path">/api/services.env</td>
           <td class="fmt">text/plain</td>
-          <td>dotenv env format (with LABEL_*_ZH / *_EN)</td>
+          <td>dotenv environment format</td>
         </tr>
         <tr>
-          <td class="path">/domain.txt</td>
+          <td class="path">/api/home.txt</td>
           <td class="fmt">text/plain</td>
-          <td>Full config file (all primary + other domains)</td>
+          <td><strong>Home domain (HOME)</strong>, raw plain text</td>
+        </tr>
+        <tr>
+          <td class="path">/services.toml</td>
+          <td class="fmt">text/plain</td>
+          <td>Full config file (services + optional labels)</td>
         </tr>
         <tr>
           <td class="path">/go.html</td>
           <td class="fmt">redirect</td>
-          <td><strong>Redirect directly to the primary domain</strong>; supports <code>?to=other</code>, <code>?to=N</code></td>
+          <td><strong>Redirect to a service</strong>; defaults to HOME, supports <code>?to=FORUM</code> etc.</td>
         </tr>
       </tbody>
     </table>
     <div class="note">
-      <b>Note:</b> this is static hosting, so Content-Type is assigned by GitHub Pages per extension;
-      a few extensions (<code>.toml</code>/<code>.ini</code>/<code>.env</code>) may get a generic type —
-      <strong>the response body format is unaffected</strong>. Static hosting also cannot issue a real
-      HTTP 302; <code>go.html</code> uses meta refresh + JS as an equivalent.
+      <b>Note:</b> This is a static site. Content-Type is assigned by GitHub Pages based on the extension;
+      some extensions (<code>.toml</code> / <code>.ini</code> / <code>.env</code>) may be served as generic types —
+      <strong>the response body format is unaffected</strong>. Static hosting cannot return a real HTTP 302;
+      <code>go.html</code> uses meta refresh + JS for an equivalent redirect.
+      <br><code>/api/domain.txt</code> is kept as a compatibility alias for <code>/api/home.txt</code>.
     </div>
   </section>
 
-  <!-- ===== Multilingual Fields ===== -->
+  <!-- ===== Data shape ===== -->
   <section class="card">
-    <h2>Multilingual Fields</h2>
+    <h2>Data shape</h2>
     <p>
-      Data field names are English (<code>primary</code> / <code>others</code> / <code>primary_domain</code>).
-      Structured formats (JSON / YAML / TOML / INI / XML / ENV) include a
-      <strong>bilingual <code>labels</code> field</strong> so front-ends can display localized copy directly.
-      CSV is pure data and carries no labels.
+      Field names are English. <code>services</code> maps variable names to domains;
+      <code>home</code> is the home variable key and <code>home_domain</code> its domain;
+      <code>labels</code> contains bilingual display names and descriptions;
+      <code>disabled</code> lists services with empty values.
     </p>
     <pre><code>{
-  "primary": ["sparkorg.dpdns.org"],
-  "others": [],
-  "primary_domain": "sparkorg.dpdns.org",
+  "home": "HOME",
+  "home_domain": "sparkorg.dpdns.org",
+  "services": {
+    "HOME": "sparkorg.dpdns.org",
+    "FORUM": "forum.sparkorg.dpdns.org",
+    "GIT": "git.sparkorg.dpdns.org",
+    "STATUS": "status.sparkorg.dpdns.org"
+  },
   "labels": {
-    "primary": { "zh": "主域名", "en": "Primary domains" },
-    "others": { "zh": "备用域名", "en": "Backup domains" },
-    "primary_domain": { "zh": "主域名（第一个 primary）", "en": "Primary domain (first primary)" }
-  }
+    "HOME": {
+      "zh": "主页",
+      "en": "Home",
+      "desc_zh": "SparkOrg 主站入口",
+      "desc_en": "SparkOrg main site"
+    }
+  },
+  "disabled": ["CLOUD_ST"]
 }</code></pre>
     <p>
-      Documentation is multilingual too: the root <code>docs.html</code> detects the browser language
-      or the site language preference (localStorage <code>lang</code>) and
-      <strong>redirects to this page (English) or docs.zh.html (Chinese)</strong>.
+      Docs are per-language: <code>docs.html</code> redirects to this page or <code>docs.zh.html</code>
+      based on browser language or the site language preference (localStorage <code>lang</code>).
     </p>
   </section>
 
-  <!-- ===== Live Demo ===== -->
+  <!-- ===== Live demo ===== -->
   <section class="card">
-    <h2>Live Demo</h2>
-    <p>Click a button to request an endpoint on this site and see the response live (same-origin, no CORS setup needed).</p>
+    <h2>Live demo</h2>
+    <p>Click a button to request the endpoint on this site and inspect the response (same-origin, no CORS setup).</p>
     <div class="demo-btns" id="demo-btns"></div>
     <div class="demo-meta" id="demo-meta">—</div>
-    <pre id="demo-out"><code>Click a button above to load a response…</code></pre>
+    <pre id="demo-out"><code>Click a button above to load an endpoint response…</code></pre>
   </section>
 
   <!-- ===== Examples ===== -->
@@ -249,117 +295,124 @@
     <h2>Examples</h2>
 
     <p><strong>Shell / curl</strong></p>
-    <pre><code># Raw primary domain (no formatting)
-curl -s https://spark-org-im.github.io/api/domain.txt
+    <pre><code># All services, plain text (one KEY=domain per line)
+curl -s https://spark-org-im.github.io/api/services.txt
+# => HOME=sparkorg.dpdns.org
+#    FORUM=forum.sparkorg.dpdns.org
+#    ...
+
+# Raw home domain
+curl -s https://spark-org-im.github.io/api/home.txt
 # => sparkorg.dpdns.org
 
 # JSON (with bilingual labels)
-curl -s https://spark-org-im.github.io/api/domain.json
+curl -s https://spark-org-im.github.io/api/services.json
 
 # YAML / TOML / XML / CSV / ENV
-curl -s https://spark-org-im.github.io/api/domain.yaml
-curl -s https://spark-org-im.github.io/api/domain.toml
-curl -s https://spark-org-im.github.io/api/domain.xml
-curl -s https://spark-org-im.github.io/api/domain.csv
-curl -s https://spark-org-im.github.io/api/domain.env
+curl -s https://spark-org-im.github.io/api/services.yaml
+curl -s https://spark-org-im.github.io/api/services.toml
+curl -s https://spark-org-im.github.io/api/services.xml
+curl -s https://spark-org-im.github.io/api/services.csv
+curl -s https://spark-org-im.github.io/api/services.env
 
 # Full config file
-curl -s https://spark-org-im.github.io/domain.txt</code></pre>
+curl -s https://spark-org-im.github.io/services.toml</code></pre>
 
     <p><strong>JavaScript / fetch</strong></p>
-    <pre><code>// Raw primary domain
-const domain = await (await fetch('https://spark-org-im.github.io/api/domain.txt')).text();
-console.log(domain.trim()); // sparkorg.dpdns.org
+    <pre><code>// All services
+const data = await (await fetch('https://spark-org-im.github.io/api/services.json')).json();
+console.log(data.home_domain);              // sparkorg.dpdns.org
+console.log(data.services.FORUM);           // forum.sparkorg.dpdns.org
+console.log(data.services.STATUS);          // status.sparkorg.dpdns.org
+console.log(data.labels.FORUM.en);          // Forum
+console.log(data.disabled);                 // ["CLOUD_ST"]
 
-// JSON + bilingual copy
-const data = await (await fetch('https://spark-org-im.github.io/api/domain.json')).json();
-console.log(data.primary_domain);           // sparkorg.dpdns.org
-console.log(data.labels.primary.zh);        // 主域名
-console.log(data.labels.primary.en);        // Primary domains</code></pre>
+// Raw home domain only
+const home = await (await fetch('https://spark-org-im.github.io/api/home.txt')).text();
+console.log(home.trim());                   // sparkorg.dpdns.org</code></pre>
 
     <p><strong>Python / requests</strong></p>
     <pre><code>import requests
 
-# Raw text
-domain = requests.get("https://spark-org-im.github.io/api/domain.txt").text.strip()
-print(domain)  # sparkorg.dpdns.org
-
-# JSON + bilingual copy
-data = requests.get("https://spark-org-im.github.io/api/domain.json").json()
-print(data["primary_domain"], data["labels"]["primary"]["en"])</code></pre>
+data = requests.get("https://spark-org-im.github.io/api/services.json").json()
+print(data["home_domain"])                  # sparkorg.dpdns.org
+print(data["services"]["GIT"])              # git.sparkorg.dpdns.org
+print(data["labels"]["GIT"]["en"])          # Git</code></pre>
   </section>
 
-  <!-- ===== Redirect ===== -->
+  <!-- ===== Redirects ===== -->
   <section class="card">
-    <h2>Redirect Endpoint</h2>
+    <h2>Redirects</h2>
     <p>
-      Open <code>https://spark-org-im.github.io/go.html</code> in a browser to
-      <strong>redirect straight to the primary domain</strong>. The page prefers a runtime read of
-      <code>domain.txt</code> to pick the target; if that fails (or JS is off) it falls back to the
-      baked-in primary domain (meta refresh fallback).
+      Open <code>https://spark-org-im.github.io/go.html</code> in a browser to <strong>redirect to HOME</strong>.
+      The page reads <code>services.toml</code> at runtime when possible; if loading fails or JS is disabled,
+      it falls back to the baked HOME domain via meta refresh.
     </p>
     <table>
       <thead>
         <tr><th>URL</th><th>Target</th></tr>
       </thead>
       <tbody>
-        <tr><td class="path">/go.html</td><td>Primary domain (default)</td></tr>
-        <tr><td class="path">/go.html?to=other</td><td>First backup domain (falls back to primary if none)</td></tr>
-        <tr><td class="path">/go.html?to=2</td><td>N-th domain (primary first, then other)</td></tr>
+        <tr><td class="path">/go.html</td><td>HOME (default)</td></tr>
+        <tr><td class="path">/go.html?to=FORUM</td><td>FORUM</td></tr>
+        <tr><td class="path">/go.html?to=GIT</td><td>GIT</td></tr>
+        <tr><td class="path">/go.html?to=STATUS</td><td>STATUS</td></tr>
+        <tr><td class="path">/go.html?to=2</td><td>N-th configured service (config order)</td></tr>
+        <tr><td class="path">/go.html?to=other</td><td>First non-HOME service (legacy alias)</td></tr>
       </tbody>
     </table>
     <div class="note">
-      <b>Tip:</b> the <code>?to=</code> parameter and live resolution require JavaScript;
-      without JS the page goes to the baked-in primary domain.
+      <b>Tip:</b> If the requested service is not configured, it falls back to HOME. The <code>?to=</code>
+      parameter and runtime config loading require JavaScript.
     </div>
   </section>
 
-  <!-- ===== Config & Sync ===== -->
+  <!-- ===== Configuration & sync ===== -->
   <section class="card">
-    <h2>Config &amp; Sync</h2>
+    <h2>Configuration &amp; sync</h2>
     <p>
-      <strong>One file to change:</strong> edit <a href="domain.txt" class="hl"><code>domain.txt</code></a> —
-      <code>primary=</code> lines are main domains, <code>other=</code> lines are backups,
-      <code>#</code> starts a comment.
+      <strong>Edit one file:</strong> <a href="services.toml" class="hl"><code>services.toml</code></a>.
+      Add or remove variables under <code>[services]</code>; leave a value empty to disable a service.
     </p>
     <table>
       <thead>
-        <tr><th>Way</th><th>Description</th></tr>
+        <tr><th>Method</th><th>Description</th></tr>
       </thead>
       <tbody>
         <tr>
           <td>GitHub Action (automatic)</td>
-          <td>Push a change to <code>domain.txt</code>; <code>.github/workflows/api-sync.yml</code> regenerates and commits every endpoint file.</td>
+          <td>Pushing a change to <code>services.toml</code> runs <code>.github/workflows/api-sync.yml</code>, which regenerates and commits every endpoint file.</td>
         </tr>
         <tr>
-          <td>Local (manual)</td>
+          <td>Local manual</td>
           <td>Run <code>node scripts/generate-api.mjs</code>, then commit.</td>
         </tr>
         <tr>
-          <td>Redirect endpoint</td>
-          <td><code>go.html</code> reads <code>domain.txt</code> at runtime — <strong>always current, even without regenerating</strong>.</td>
+          <td>Redirect page</td>
+          <td><code>go.html</code> reads <code>services.toml</code> at runtime, so redirects are always current.</td>
         </tr>
       </tbody>
     </table>
   </section>
 
   <footer>
-    Powered by a single config file: <a href="domain.txt" class="hl">domain.txt</a> · <a href="docs.zh.html" class="hl">中文</a>
+    Powered by a single <a href="services.toml" class="hl">services.toml</a> · <a href="docs.zh.html" class="hl">中文</a>
   </footer>
 </main>
 
 <script>
-/* ===== Live demo: request endpoints on this site directly ===== */
+/* ===== Live demo: request static endpoints on this site ===== */
 var ENDPOINTS = [
-  { path: '/api/domain.txt', label: 'TXT raw' },
-  { path: '/api/domain.json', label: 'JSON' },
-  { path: '/api/domain.yaml', label: 'YAML' },
-  { path: '/api/domain.toml', label: 'TOML' },
-  { path: '/api/domain.ini', label: 'INI' },
-  { path: '/api/domain.xml', label: 'XML' },
-  { path: '/api/domain.csv', label: 'CSV' },
-  { path: '/api/domain.env', label: 'ENV' },
-  { path: '/domain.txt', label: 'Full config' }
+  { path: '/api/services.txt', label: 'TXT plain' },
+  { path: '/api/services.json', label: 'JSON' },
+  { path: '/api/services.yaml', label: 'YAML' },
+  { path: '/api/services.toml', label: 'TOML' },
+  { path: '/api/services.ini', label: 'INI' },
+  { path: '/api/services.xml', label: 'XML' },
+  { path: '/api/services.csv', label: 'CSV' },
+  { path: '/api/services.env', label: 'ENV' },
+  { path: '/api/home.txt', label: 'HOME plain' },
+  { path: '/services.toml', label: 'Full config' }
 ];
 
 var BASE = location.protocol + '//' + location.host;

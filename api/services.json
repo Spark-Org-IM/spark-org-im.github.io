@@ -1,0 +1,45 @@
+{
+  "home": "HOME",
+  "home_domain": "sparkorg.dpdns.org",
+  "services": {
+    "HOME": "sparkorg.dpdns.org",
+    "FORUM": "forum.sparkorg.dpdns.org",
+    "GIT": "git.sparkorg.dpdns.org",
+    "STATUS": "status.sparkorg.dpdns.org"
+  },
+  "labels": {
+    "HOME": {
+      "zh": "主页",
+      "en": "Home",
+      "desc_zh": "SparkOrg 主站入口",
+      "desc_en": "SparkOrg main site"
+    },
+    "FORUM": {
+      "zh": "论坛",
+      "en": "Forum",
+      "desc_zh": "社区交流与讨论",
+      "desc_en": "Community discussion forum"
+    },
+    "GIT": {
+      "zh": "Git 服务",
+      "en": "Git",
+      "desc_zh": "代码托管与仓库服务",
+      "desc_en": "Source code hosting service"
+    },
+    "STATUS": {
+      "zh": "状态页",
+      "en": "Status",
+      "desc_zh": "各服务的运行状态与公告",
+      "desc_en": "Service status and announcements"
+    },
+    "CLOUD_ST": {
+      "zh": "云服务状态",
+      "en": "Cloud Status",
+      "desc_zh": "云平台运行状态",
+      "desc_en": "Cloud platform status"
+    }
+  },
+  "disabled": [
+    "CLOUD_ST"
+  ]
+}

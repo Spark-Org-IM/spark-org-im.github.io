@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SparkOrg · Services API（由 scripts/generate-api.mjs 从 services.toml 生成，请勿手工编辑） -->
+<services home="HOME" home_domain="sparkorg.dpdns.org">
+  <service key="HOME" domain="sparkorg.dpdns.org">
+    <zh>主页</zh>
+    <en>Home</en>
+    <desc_zh>SparkOrg 主站入口</desc_zh>
+    <desc_en>SparkOrg main site</desc_en>
+  </service>
+  <service key="FORUM" domain="forum.sparkorg.dpdns.org">
+    <zh>论坛</zh>
+    <en>Forum</en>
+    <desc_zh>社区交流与讨论</desc_zh>
+    <desc_en>Community discussion forum</desc_en>
+  </service>
+  <service key="GIT" domain="git.sparkorg.dpdns.org">
+    <zh>Git 服务</zh>
+    <en>Git</en>
+    <desc_zh>代码托管与仓库服务</desc_zh>
+    <desc_en>Source code hosting service</desc_en>
+  </service>
+  <service key="STATUS" domain="status.sparkorg.dpdns.org">
+    <zh>状态页</zh>
+    <en>Status</en>
+    <desc_zh>各服务的运行状态与公告</desc_zh>
+    <desc_en>Service status and announcements</desc_en>
+  </service>
+  <disabled>
+    <service>CLOUD_ST</service>
+  </disabled>
+</services>
