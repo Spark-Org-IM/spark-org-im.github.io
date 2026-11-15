@@ -5,7 +5,9 @@
     "HOME": "sparkorg.dpdns.org",
     "FORUM": "forum.sparkorg.dpdns.org",
     "GIT": "git.sparkorg.dpdns.org",
-    "STATUS": "status.sparkorg.dpdns.org"
+    "STATUS": "status.sparkorg.dpdns.org",
+    "CLOUD_ST": "cloud.sparkorg.dpdns.org",
+    "FDROID": "fdroid.sparkorg.dpdns.org"
   },
   "labels": {
     "HOME": {
@@ -33,13 +35,17 @@
       "desc_en": "Service status and announcements"
     },
     "CLOUD_ST": {
-      "zh": "云服务状态",
-      "en": "Cloud Status",
-      "desc_zh": "云平台运行状态",
-      "desc_en": "Cloud platform status"
+      "zh": "Fdroid 镜像源",
+      "en": "Fdroid Source",
+      "desc_zh": "发布组织的Android开源应用程序和我们找到的其他好用开源Android应用程序(不定时更新,不过可以发邮件提醒更新)",
+      "desc_en": "Open-source Android apps released by our organization and other useful open-source Android apps we've found (updated irregularly; email us to be reminded about updates)"
+    },
+    "FDROID": {
+      "zh": "FDROID",
+      "en": "FDROID",
+      "desc_zh": "服务 FDROID",
+      "desc_en": "Service FDROID"
     }
   },
-  "disabled": [
-    "CLOUD_ST"
-  ]
+  "disabled": []
 }

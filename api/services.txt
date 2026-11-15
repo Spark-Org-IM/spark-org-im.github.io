@@ -2,3 +2,5 @@ HOME=sparkorg.dpdns.org
 FORUM=forum.sparkorg.dpdns.org
 GIT=git.sparkorg.dpdns.org
 STATUS=status.sparkorg.dpdns.org
+CLOUD_ST=cloud.sparkorg.dpdns.org
+FDROID=fdroid.sparkorg.dpdns.org
