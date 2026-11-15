@@ -26,15 +26,15 @@
     <desc_en>Service status and announcements</desc_en>
   </service>
   <service key="CLOUD_ST" domain="cloud.sparkorg.dpdns.org">
+    <zh>云服务</zh>
+    <en>Cloud</en>
+    <desc_zh>云平台</desc_zh>
+    <desc_en>Nextcloud</desc_en>
+  </service>
+  <service key="FDROID" domain="fdroid.sparkorg.dpdns.org">
     <zh>Fdroid 镜像源</zh>
     <en>Fdroid Source</en>
     <desc_zh>发布组织的Android开源应用程序和我们找到的其他好用开源Android应用程序(不定时更新,不过可以发邮件提醒更新)</desc_zh>
     <desc_en>Open-source Android apps released by our organization and other useful open-source Android apps we've found (updated irregularly; email us to be reminded about updates)</desc_en>
-  </service>
-  <service key="FDROID" domain="fdroid.sparkorg.dpdns.org">
-    <zh>FDROID</zh>
-    <en>FDROID</en>
-    <desc_zh>服务 FDROID</desc_zh>
-    <desc_en>Service FDROID</desc_en>
   </service>
 </services>

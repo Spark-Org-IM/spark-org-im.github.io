@@ -386,8 +386,8 @@ function buildGoHtml(model) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 无 JS 兜底：5 秒后跳转到生成时的 HOME -->
-<meta http-equiv="refresh" content="5; url=${bakedUrl}">
+<!-- 无 JS 兜底：8 秒后跳转到生成时的 HOME -->
+<meta http-equiv="refresh" content="8; url=${bakedUrl}">
 <title>跳转中… / Redirecting…</title>
 <style>
   :root{
@@ -535,14 +535,15 @@ applyUI('https://' + BAKED_HOME);
 function fallback(){ go('https://' + BAKED_HOME); }
 
 if(window.fetch){
-  fetch('services.toml')
+  fetch('services.toml', { cache: 'no-store' })
     .then(function(r){ if(!r.ok) throw 0; return r.text(); })
     .then(function(t){ go('https://' + pickTarget(parseServices(t))); })
     .catch(fallback);
 } else {
   fallback();
 }
-setTimeout(fallback, 2000);
+/* 不再用 setTimeout 兜底：2 秒定时器会在 fetch 较慢时抢先跳到 HOME，
+   导致 ?to=XXX 全部失效；真正的兜底交给 <meta refresh>。 */
 </script>
 
 </body>

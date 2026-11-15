@@ -50,7 +50,7 @@ en = "Cloud"
 desc_zh = "云平台"
 desc_en = "Nextcloud"
 
-[labels.CLOUD_ST]
+[labels.FDROID]
 zh = "Fdroid 镜像源"
 en = "Fdroid Source"
 desc_zh = "发布组织的Android开源应用程序和我们找到的其他好用开源Android应用程序(不定时更新,不过可以发邮件提醒更新)"
