@@ -114,7 +114,6 @@ curl -s https://spark-org-im.github.io/api/services.yaml
 - `https://spark-org-im.github.io/go.html?to=STATUS` → STATUS
 - `https://spark-org-im.github.io/go.html?to=2` → 第 N 个已配置服务 / N-th configured service
 - `https://spark-org-im.github.io/go.html?to=other` → 第一个非 HOME 服务（兼容旧参数）
-- `https://spark-org-im.github.io/go.html?to=FDROID/repo/` → 服务 + 路径后缀 / service with a path suffix
 
 `go.html` 优先**运行时实时读取** `services.toml`，因此跳转始终使用最新配置；
 若读取失败或 JS 不可用，回退到生成时烘焙的 HOME 域名（meta refresh 兜底）。
