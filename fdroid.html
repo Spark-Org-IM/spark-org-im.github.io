@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>添加 F-Droid 仓库 / Add F-Droid Repository</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#181b23; --text:#e8eaed; --muted:#9aa0aa;
+    --line:#2a2e38; --primary:#3b82f6; --primary-soft:rgba(59,130,246,.15);
+    --ok:#22c55e; --ok-soft:rgba(34,197,94,.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .wrap{width:100%; max-width:520px;}
+  .logo{font-size:13px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:10px; text-align:center;}
+  h1{font-size:22px; margin:0 0 6px; text-align:center;}
+  .sub{font-size:14px; color:var(--muted); margin:0 0 24px; text-align:center;}
+  .oneclick{
+    display:block; text-align:center; padding:16px 20px; border-radius:12px;
+    background:var(--primary); color:#fff; text-decoration:none; font-size:17px; font-weight:600;
+    transition:filter .15s;
+  }
+  .oneclick:hover{filter:brightness(1.1);}
+  .hint{font-size:12px; color:var(--muted); line-height:1.7; margin:10px 0 22px; text-align:center;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:6px 16px; margin-bottom:20px;}
+  .row{display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:0;}
+  .label{flex:0 0 76px; font-size:13px; color:var(--muted);}
+  code{
+    flex:1; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px;
+    word-break:break-all; line-height:1.6;
+  }
+  button{
+    flex:0 0 auto; padding:6px 10px; font-size:12px; cursor:pointer;
+    background:transparent; color:var(--primary); border:1px solid var(--line); border-radius:8px;
+  }
+  button:hover{border-color:var(--primary); background:var(--primary-soft);}
+  button.done{color:var(--ok); border-color:var(--ok); background:var(--ok-soft);}
+  ol{font-size:13px; color:var(--muted); line-height:1.9; padding-left:20px; margin:0 0 16px;}
+  .back{font-size:13px; text-align:center;}
+  a{color:var(--primary);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="logo">SparkOrg</div>
+  <h1>添加 F-Droid 仓库</h1>
+  <p class="sub">Spark ORG · F-Droid 镜像源 / Repository</p>
+
+  <a class="oneclick" id="oneclick" href="fdroidrepos://fdroid.sparkorg.dpdns.org/repo?fingerprint=4F4A990CDCE1F658184BABA1A92DB1396306CE2DC522A620ACAFFEA1C62863CB">一键添加到 F-Droid</a>
+  <p class="hint">
+    在手机上点击会唤起 F-Droid 客户端并弹出添加确认。<br>
+    电脑上点不动是正常的，请用下面的地址手动添加。<br>
+    On a phone this opens your F-Droid client; on desktop use the address below.
+  </p>
+
+  <div class="card">
+    <div class="row">
+      <span class="label">仓库地址</span>
+      <code id="repo">https://fdroid.sparkorg.dpdns.org/repo/</code>
+      <button data-copy="repo">复制</button>
+    </div>
+    <div class="row">
+      <span class="label">签名指纹</span>
+      <code id="fp">4F4A 990C DCE1 F658 184B ABA1 A92D B139 6306 CE2D C522 A620 ACAF FEA1 C628 63CB</code>
+      <button data-copy="fp">复制</button>
+    </div>
+  </div>
+
+  <ol>
+    <li>打开 F-Droid → 设置 → 仓库 / Repositories → 添加仓库</li>
+    <li>粘贴上面的仓库地址（以 <code style="font-size:12px">/repo/</code> 结尾）</li>
+    <li>保存后等待索引同步完成即可搜索安装</li>
+  </ol>
+
+  <p class="back"><a href="./go.html?to=FDROID/repo/">→ 用浏览器打开仓库页面</a></p>
+</div>
+
+<script>
+  /* 指纹用紧凑 32 字节十六进制，复制时去掉空格方便粘贴 */
+  function compact(text){ return text.replace(/\s+/g, '').toUpperCase(); }
+
+  document.querySelectorAll('button[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var el = document.getElementById(btn.getAttribute('data-copy'));
+      var text = compact(el.textContent);
+      var done = function(){
+        var old = btn.textContent;
+        btn.textContent = '已复制';
+        btn.classList.add('done');
+        setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1500);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(text).then(done, function(){ fallback(text, done); });
+      } else {
+        fallback(text, done);
+      }
+    });
+  });
+
+  function fallback(text, done){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch(e){}
+    document.body.removeChild(ta);
+  }
+</script>
+
+</body>
+</html>

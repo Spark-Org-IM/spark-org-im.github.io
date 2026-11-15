@@ -98,6 +98,14 @@ curl -s https://spark-org-im.github.io/api/services.toml
 curl -s https://spark-org-im.github.io/api/services.yaml
 ```
 
+## F-Droid 仓库 / Repository
+
+- 一键添加页（手机点按钮会唤起客户端）：`https://spark-org-im.github.io/fdroid.html`
+- 仓库地址：`https://fdroid.sparkorg.dpdns.org/repo/`
+- 客户端一键链接：`fdroidrepos://fdroid.sparkorg.dpdns.org/repo?fingerprint=4F4A990CDCE1F658184BABA1A92DB1396306CE2DC522A620ACAFFEA1C62863CB`
+
+> `go.html` 只是浏览器跳转页，**不能**作为 F-Droid 仓库地址（客户端不执行 JS）。
+
 ## 跳转接口 / Redirect
 
 - `https://spark-org-im.github.io/go.html` → HOME
